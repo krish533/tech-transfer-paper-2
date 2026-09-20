@@ -5,20 +5,20 @@ Policy Communication and Technology Transfer:
 Evidence from University Intellectual Property Governance Documents
 Sharma, Wang, Basnet, Cossco (2026)
 
-Produces ALL tables and figures in the paper:
+Produces all tables and analyses in the paper:
 
   TABLE 1   — Descriptive Statistics
   TABLE 2   — Main TWFE Results + Lag Sensitivity
-  TABLE 3   — Heterogeneity (split-sample) + Mundlak Decomposition
+  TABLE 3   — Heterogeneity (split-sample)
   TABLE 4   — Channel Analysis + Multiple Testing
-  FIGURE 1  — Event Study: Pre/Post Coefficients for Patent Apps vs Disclosures
   APP A1    — Sub-Index Correlation Matrix
   APP B1    — Robustness Suite (winsorize, balanced, R1, HC3, Nickell, quad trend,
                falsification, leave-one-out)
-  APP B2    — Lag Sensitivity across all outcomes
+  APP B2    — Negative-binomial count-model robustness
+  APP B3    — Lag Sensitivity across all outcomes
 
 Requirements:
-  pip install pandas numpy scipy statsmodels matplotlib
+  pip install pandas numpy scipy statsmodels
 
 Data file:  data/merged_autm.csv
 
@@ -29,40 +29,27 @@ import sys
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from scipy import stats
+from scipy import stats, linalg
 from statsmodels.stats.multitest import multipletests
 import statsmodels.api as sm
 from statsmodels.discrete.discrete_model import NegativeBinomial
 from statsmodels.discrete.count_model import ZeroInflatedPoisson
-import matplotlib
-matplotlib.use("Agg")          # non-interactive backend for servers
-import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_PATH = PACKAGE_ROOT / "data" / "merged_autm.csv"
-DEFAULT_FIGURE_PATH = PACKAGE_ROOT / "paper_outputs" / "figures" / "figure1_event_study.png"
-
-
-def _display_path(path):
-    try:
-        return Path(path).resolve().relative_to(PACKAGE_ROOT).as_posix()
-    except ValueError:
-        return str(path)
 
 SEED        = 42
 WIN_TRIM    = 0.01             # winsorize at 1st / 99th percentile
-EVENT_WIN   = 4                # years before/after revision to show in event study
 # Revision threshold: abs(dPCI) must exceed this to count as a policy revision
 # Set to 75th-percentile of non-trivial absolute changes ≈ 0.054
 REVISION_THRESHOLD = 0.05
-LAST_RI_P   = None
+LAST_PLACEBO_P = None
 BASE_CONTROLS = (
     "ln_research_exp_l1",
     "ln_licensing_ftes_l1",
     "royalty_share_l1",
-    "tlo_age_l1",
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -174,83 +161,44 @@ def load_and_prepare(path=None):
     if "ln_new_patent_apps" in df.columns and "ln_disclosures" in df.columns:
         df["conv_rate"] = df["ln_new_patent_apps"] - df["ln_disclosures"]
 
-    # ── lagged variables (k = 1, 2, 3) ────────────────────────────────────
+    # ── calendar-year lags (k = 1, ..., 5) ────────────────────────────────────
     lag_src = [
         "pci", "pci_median",
         "tone_index", "clarity_index", "legal_load_index",
         "ln_research_exp", "ln_licensing_ftes", "royalty_share", "tlo_age",
     ]
+    if df.duplicated(["institution_id", "year"]).any():
+        raise ValueError("institution_id-year keys must be unique to build lags")
     for v in lag_src:
         if v not in df.columns:
             continue
-        for k in [1, 2, 3]:
-            df[f"{v}_l{k}"] = df.groupby("institution_id")[v].transform(
-                lambda s, k=k: s.shift(k)
-            )
-
-    # ── Mundlak components ─────────────────────────────────────────────────
-    if "pci" in df.columns:
-        df["pci_mean"]   = df.groupby("institution_id")["pci"].transform("mean")
-        df["pci_within"] = df["pci_l1"] - df["pci_mean"]
+        lookup = df.set_index(["institution_id", "year"])[v]
+        for k in [1, 2, 3, 4, 5]:
+            lag_index = pd.MultiIndex.from_arrays([
+                df["institution_id"],
+                df["year"] - k,
+            ])
+            df[f"{v}_l{k}"] = lookup.reindex(lag_index).to_numpy()
 
     # ── additional robustness variables ───────────────────────────────────
     if "ln_new_patent_apps" in df.columns:
-        df["ln_new_patent_apps_lag"] = df.groupby("institution_id")[
-            "ln_new_patent_apps"
-        ].transform(lambda s: s.shift(1))
+        lookup = df.set_index(["institution_id", "year"])["ln_new_patent_apps"]
+        lag_index = pd.MultiIndex.from_arrays([
+            df["institution_id"],
+            df["year"] - 1,
+        ])
+        df["ln_new_patent_apps_lag"] = lookup.reindex(lag_index).to_numpy()
 
     if "ln_research_exp" in df.columns:
-        df["ln_research_exp_fwd"] = df.groupby("institution_id")[
-            "ln_research_exp"
-        ].transform(lambda s: s.shift(-1))
+        lookup = df.set_index(["institution_id", "year"])["ln_research_exp"]
+        lead_index = pd.MultiIndex.from_arrays([
+            df["institution_id"],
+            df["year"] + 1,
+        ])
+        df["ln_research_exp_fwd"] = lookup.reindex(lead_index).to_numpy()
 
-    # Quadratic time trend (demeaned within institution)
-    df["year2"]    = df["year"] ** 2
-    df["year_dm"]  = (df["year"]
-                      - df.groupby("institution_id")["year"].transform("mean"))
-    df["year2_dm"] = (df["year2"]
-                      - df.groupby("institution_id")["year2"].transform("mean"))
-
-    # ── event study variables ──────────────────────────────────────────────
-    df = _build_event_study_vars(df)
-
-    return df
-
-
-def _build_event_study_vars(df):
-    """
-    Identify policy revision events and compute event-time dummies.
-
-    A 'large positive revision' is defined as the FIRST year in which an
-    institution's PCI increases by more than REVISION_THRESHOLD in a single
-    year.  We use first-revision only to avoid stacking multiple events on
-    the same institution.
-
-    Returns df with columns:
-      revision_year   — year of first large positive revision (NaN if none)
-      event_time      — year − revision_year (NaN if not treated)
-      event_{k}       — indicator for event_time == k, k ∈ [−WIN, +WIN]
-                        event_{-1} is the omitted baseline
-    """
-    df = df.copy()
-    df["pci_change"] = df.groupby("institution_id")["pci"].diff()
-
-    # First year with a large positive PCI change
-    mask = df["pci_change"] > REVISION_THRESHOLD
-    first_rev = (df[mask]
-                 .groupby("institution_id")["year"]
-                 .min()
-                 .rename("revision_year"))
-
-    df = df.merge(first_rev, on="institution_id", how="left")
-    df["event_time"] = df["year"] - df["revision_year"]
-
-    # Create event-time dummies (omit k = −1 as baseline)
-    for k in range(-EVENT_WIN, EVENT_WIN + 1):
-        if k == -1:
-            continue
-        df[f"event_{k}"] = ((df["event_time"] == k) &
-                             df["revision_year"].notna()).astype(float)
+    # Consecutive-year policy-score changes used for descriptive revision counts.
+    df["pci_change"] = df["pci"] - df["pci_l1"]
 
     return df
 
@@ -258,6 +206,33 @@ def _build_event_study_vars(df):
 # ─────────────────────────────────────────────────────────────────────────────
 # 2.  CORE ESTIMATOR: TWO-WAY FE WITH CLUSTERED OR HC3 STANDARD ERRORS
 # ─────────────────────────────────────────────────────────────────────────────
+
+def _iterative_within_transform(sub, columns, entity, time,
+                                tol=1e-10, max_iter=10000):
+    """
+    Absorb entity and time fixed effects by alternating projections.
+
+    Unlike one-pass double demeaning, this is exact for unbalanced panels.
+    """
+    values = sub[list(columns)].to_numpy(dtype=float)
+    entity_codes, entities = pd.factorize(sub[entity], sort=False)
+    time_codes, periods = pd.factorize(sub[time], sort=False)
+
+    def demean(x, codes, n_groups):
+        sums = np.zeros((n_groups, x.shape[1]))
+        np.add.at(sums, codes, x)
+        counts = np.bincount(codes, minlength=n_groups).astype(float)
+        return x - sums[codes] / counts[codes, None]
+
+    for _ in range(max_iter):
+        previous = values.copy()
+        values = demean(values, entity_codes, len(entities))
+        values = demean(values, time_codes, len(periods))
+        if np.max(np.abs(values - previous)) < tol:
+            return values
+
+    raise RuntimeError("Fixed-effect absorption did not converge")
+
 
 def twfe(df, outcome, treatment="pci_l1",
          controls=BASE_CONTROLS,
@@ -275,8 +250,8 @@ def twfe(df, outcome, treatment="pci_l1",
     controls      : tuple of str — additional controls
     entity, time  : str — panel identifiers
     se_type       : 'cluster' (default) | 'hc3'
-    extra_regressors : tuple of str — additional right-hand side vars
-                       (used for joint sub-index specs and event study)
+    extra_regressors : tuple of str — additional right-hand side variables
+                       used for joint specifications
 
     Returns
     -------
@@ -303,19 +278,22 @@ def twfe(df, outcome, treatment="pci_l1",
         + list(extra_regressors)
     )
 
-    # Within-transformation: entity-demean + time-demean + grand mean back
-    for col in reg_vars:
-        sub[f"{col}_w"] = (
-            sub[col]
-            - sub.groupby(entity)[col].transform("mean")
-            - sub.groupby(time)[col].transform("mean")
-            + sub[col].mean()
-        )
-
-    y     = sub[f"{outcome}_w"].values
     x_names = [treatment] + list(controls) + list(extra_regressors)
-    Xw    = [sub[f"{v}_w"].values for v in x_names]
-    X     = np.column_stack([np.ones(len(sub))] + Xw)
+    transformed = _iterative_within_transform(
+        sub, reg_vars, entity=entity, time=time
+    )
+    y = transformed[:, 0]
+    X_full = transformed[:, 1:]
+    norms = np.linalg.norm(X_full, axis=0)
+    rank_tol = max(1e-10, norms.max(initial=0) * 1e-10)
+    active = norms > rank_tol
+    if not active[0]:
+        nan = float("nan")
+        return dict(beta=nan, se=nan, p=nan, n=len(sub),
+                    ci_lo=nan, ci_hi=nan, t=nan,
+                    all_betas={}, all_ses={})
+    active_names = [name for name, keep in zip(x_names, active) if keep]
+    X = X_full[:, active]
     n, k  = X.shape
 
     beta_hat, _, _, _ = np.linalg.lstsq(X, y, rcond=None)
@@ -324,17 +302,18 @@ def twfe(df, outcome, treatment="pci_l1",
     # ── variance estimator ─────────────────────────────────────────────────
     if se_type == "hc3":
         # HC3: leave-one-out leverage correction
-        H_diag = np.einsum("ij,jk,ik->i", X, np.linalg.inv(X.T @ X), X)
+        bread = np.linalg.pinv(X.T @ X)
+        H_diag = np.einsum("ij,jk,ik->i", X, bread, X)
         e_adj  = resid / (1.0 - np.clip(H_diag, None, 0.9999))
         meat   = (X * e_adj[:, None]).T @ (X * e_adj[:, None])
-        V      = np.linalg.inv(X.T @ X) @ meat @ np.linalg.inv(X.T @ X)
+        V      = bread @ meat @ bread
         df_t   = n - k
     else:
         # Clustered SE (Cameron & Miller 2015)
         clusters = sub[entity].values
         uniq     = np.unique(clusters)
         G        = len(uniq)
-        bread    = np.linalg.inv(X.T @ X)
+        bread    = np.linalg.pinv(X.T @ X)
         meat     = np.zeros((k, k))
         for g in uniq:
             idx = clusters == g
@@ -346,14 +325,16 @@ def twfe(df, outcome, treatment="pci_l1",
 
     se_vec = np.sqrt(np.diag(V).clip(0))
 
-    # Treatment coefficient (index 1 in beta_hat)
-    b, se_b = beta_hat[1], se_vec[1]
+    # Treatment is the first transformed regressor.
+    b, se_b = beta_hat[active_names.index(treatment)], se_vec[active_names.index(treatment)]
     t_stat  = b / se_b if se_b > 0 else float("nan")
     p_val   = 2 * (1 - stats.t.cdf(abs(t_stat), df=df_t))
 
-    # All coefficients (for event study / joint specs)
-    all_betas = {v: beta_hat[i + 1] for i, v in enumerate(x_names)}
-    all_ses   = {v: se_vec[i + 1]   for i, v in enumerate(x_names)}
+    # All coefficients for joint specifications
+    all_betas = {v: float("nan") for v in x_names}
+    all_ses   = {v: float("nan") for v in x_names}
+    all_betas.update({v: beta_hat[i] for i, v in enumerate(active_names)})
+    all_ses.update({v: se_vec[i] for i, v in enumerate(active_names)})
     all_ps    = {}
     all_ci_lo = {}
     all_ci_hi = {}
@@ -584,7 +565,6 @@ def table2_baseline_eq1(df):
         tuple(),
         ("ln_research_exp_l1",),
         ("ln_research_exp_l1", "ln_licensing_ftes_l1"),
-        ("ln_research_exp_l1", "ln_licensing_ftes_l1", "royalty_share_l1"),
         BASE_CONTROLS,
     ]
     results = [twfe(sub, "ln_new_patent_apps", controls=s) for s in specs]
@@ -594,11 +574,11 @@ def table2_baseline_eq1(df):
         ("ln_research_exp_l1", "Lagged ln(Research Exp.)"),
         ("ln_licensing_ftes_l1", "Lagged ln(Licensing FTEs)"),
         ("royalty_share_l1", "Lagged Inventor Royalty Share"),
-        ("tlo_age_l1", "Lagged TLO Age"),
     ]
 
-    print("\n  Specification".ljust(34) + " (1)        (2)        (3)        (4)        (5)")
-    print("  " + "-" * 76)
+    print("\n  Specification".ljust(34)
+          + "".join(f"{f'({i})':>11}" for i in range(1, len(specs) + 1)))
+    print("  " + "-" * (32 + 11 * len(specs)))
     for var, label in row_vars:
         coef_line = f"  {label:<32}"
         se_line = "  " + " " * 32
@@ -616,15 +596,15 @@ def table2_baseline_eq1(df):
         print(se_line)
 
     yesno = lambda included: "Yes" if included else "No"
-    print("  " + "-" * 76)
+    print("  " + "-" * (32 + 11 * len(specs)))
     print(f"  {'Lagged ln(Research Exp.)':<32}" + "".join(f"{yesno('ln_research_exp_l1' in s):>11}" for s in specs))
     print(f"  {'Lagged ln(Licensing FTEs)':<32}" + "".join(f"{yesno('ln_licensing_ftes_l1' in s):>11}" for s in specs))
     print(f"  {'Lagged Royalty Share':<32}" + "".join(f"{yesno('royalty_share_l1' in s):>11}" for s in specs))
-    print(f"  {'Lagged TLO Age':<32}" + "".join(f"{yesno('tlo_age_l1' in s):>11}" for s in specs))
     print(f"  {'Institution FE':<32}" + "".join(f"{'Yes':>11}" for _ in specs))
     print(f"  {'Year FE':<32}" + "".join(f"{'Yes':>11}" for _ in specs))
     print(f"  {'Observations':<32}" + "".join(f"{r['n']:>11,}" for r in results))
     print(f"  {'R-squared':<32}" + "".join(f"{r['r2']:>11.3f}" for r in results))
+    print("\n  Note: TLO age is omitted because it is collinear with institution and year fixed effects.")
 
 
 def _stars(p):
@@ -732,6 +712,8 @@ def table2(df):
         ("pci_l1",        "Baseline: lag-1 PCI"),
         ("pci_l2",        "Lag-2 PCI"),
         ("pci_l3",        "Lag-3 PCI"),
+        ("pci_l4",        "Lag-4 PCI"),
+        ("pci_l5",        "Lag-5 PCI"),
         ("pci_median_l1", "Median PCI (lagged)"),
     ]
     for tvar, label in specs:
@@ -745,246 +727,97 @@ def table2(df):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 5.  EVENT STUDY
+# 5.  RANDOMIZATION INFERENCE
 # ─────────────────────────────────────────────────────────────────────────────
 
-def event_study(df, outcomes=None, window=EVENT_WIN, plot=True,
-                out_path="figure1_event_study.png"):
+def circular_shift_placebo(df, outcome="ln_new_patent_apps",
+                           treatment="pci_l1", n_perms=2000):
     """
-    Estimate and (optionally) plot the event-study model around large positive
-    policy revisions.
+    Within-institution circular-shift placebo test.
 
-    Model:
-        y_it = α_i + γ_t + Σ_{k≠-1} β_k event_{k} + X_it δ + ε_it
-
-    where event_{k} = 1[year − revision_year == k] for treated institutions,
-    and event_{-1} = omitted baseline.
-
-    Parameters
-    ----------
-    df       : prepared DataFrame (from load_and_prepare)
-    outcomes : list of (col, label) pairs; defaults to patent apps + disclosures
-    window   : int — number of years before/after to show
-    plot     : bool — save figure to out_path
-    out_path : str — file path for figure
-
-    Returns
-    -------
-    dict keyed by outcome column, each containing lists of betas and SEs
-    by event time.
+    Circular shifts preserve each institution's PCI sequence and serial
+    dependence while breaking its calendar alignment with the outcome.
     """
-    if outcomes is None:
-        outcomes = [
-            ("ln_new_patent_apps", "Ln(New Patent Applications)"),
-            ("ln_disclosures",     "Ln(Disclosures)"),
-        ]
-
-    event_dummies = [f"event_{k}" for k in range(-window, window + 1)
-                     if k != -1 and f"event_{k}" in df.columns]
-
-    if not event_dummies:
-        print("No event dummies found. Check REVISION_THRESHOLD.")
-        return {}
-
-    # Print counts
-    treated = df["revision_year"].notna().sum()
-    n_inst  = df.loc[df["revision_year"].notna(), "institution_id"].nunique()
+    global LAST_PLACEBO_P
     print("\n" + "=" * 74)
-    print("EVENT STUDY: Pre/Post Coefficients Around Policy Revisions")
+    print(f"CIRCULAR-SHIFT PLACEBO INFERENCE  (seed={SEED}, n={n_perms})")
     print("=" * 74)
-    print(f"  Treated obs: {treated:,}  |  Treated institutions: {n_inst}")
-    print(f"  Revision threshold: |dPCI| > {REVISION_THRESHOLD:.3f}  "
-          f"(positive revisions only)")
-    print(f"  Window: -{window} to +{window} years  |  Baseline: year -1\n")
-
-    all_results = {}
-
-    for var, label in outcomes:
-        if var not in df.columns:
-            continue
-
-        r = twfe(df, var,
-                 treatment=event_dummies[0],
-                 controls=BASE_CONTROLS,
-                 extra_regressors=tuple(event_dummies[1:]))
-
-        ks     = []
-        betas  = []
-        ses    = []
-        p_vals = []
-
-        for k in range(-window, window + 1):
-            ks.append(k)
-            if k == -1:
-                betas.append(0.0)
-                ses.append(0.0)
-                p_vals.append(1.0)
-            else:
-                key = f"event_{k}"
-                b   = r["all_betas"].get(key, float("nan"))
-                se  = r["all_ses"].get(key, float("nan"))
-                betas.append(b)
-                ses.append(se)
-                p_val = (2 * (1 - stats.t.cdf(abs(b / se), df=n_inst - 1))
-                         if se > 0 else float("nan"))
-                p_vals.append(p_val)
-
-        all_results[var] = dict(ks=ks, betas=betas, ses=ses, p_vals=p_vals,
-                                label=label, n=r["n"])
-
-        # Print table
-        print(f"  {label}  (N = {r['n']:,})")
-        print(f"  {'k':>5} {'beta':>9} {'SE':>8} {'p':>8}  CI")
-        print("  " + "-" * 52)
-        for k, b, se, pv in zip(ks, betas, ses, p_vals):
-            if k == -1:
-                print(f"  {k:>5}   (baseline = 0)")
-                continue
-            ci = f"[{b-1.96*se:+.3f}, {b+1.96*se:+.3f}]"
-            print(f"  {k:>5} {b:>+9.3f}{_stars(pv):<3} {se:>8.3f} "
-                  f"{pv:>8.3f}  {ci}")
-
-        # Pre-trend joint test (k = -window ... -2)
-        pre_ks    = [k for k in range(-window, -1)]
-        pre_betas = [betas[k + window] for k in pre_ks]
-        pre_ses   = [ses[k + window]   for k in pre_ks]
-        if all(not np.isnan(b) and s > 0 for b, s in zip(pre_betas, pre_ses)):
-            chi2 = sum((b / s) ** 2 for b, s in zip(pre_betas, pre_ses))
-            pt   = 1 - stats.chi2.cdf(chi2, df=len(pre_ks))
-            status = "[PASS]" if pt > 0.10 else "[FAIL]"
-            print(f"\n  Pre-trend joint test (k={pre_ks[0]}...{pre_ks[-1]}): "
-                  f"chi2({len(pre_ks)}) = {chi2:.2f},  p = {pt:.3f}  {status}")
-        print()
-
-    # ── Figure ──────────────────────────────────────────────────────────────
-    if plot and all_results:
-        _plot_event_study(all_results, window, out_path)
-
-    return all_results
-
-
-def _plot_event_study(results, window, out_path):
-    """
-    Two-panel figure: left = patent applications, right = disclosures.
-    Each panel shows point estimates with 95% CIs.
-    Shaded region = pre-period. Vertical dashed line at k = 0.
-    """
-    outcomes = list(results.keys())
-    n_panels = len(outcomes)
-
-    fig, axes = plt.subplots(1, n_panels, figsize=(5.5 * n_panels, 4.5),
-                             sharey=False)
-    if n_panels == 1:
-        axes = [axes]
-
-    colors = {"ln_new_patent_apps": "#1a5276",
-              "ln_disclosures":     "#922b21"}
-    default_color = "#2c3e50"
-
-    for ax, var in zip(axes, outcomes):
-        res   = results[var]
-        ks    = np.array(res["ks"])
-        betas = np.array(res["betas"])
-        ses   = np.array(res["ses"])
-
-        color = colors.get(var, default_color)
-
-        # Shaded pre-period
-        ax.axvspan(-window - 0.5, -0.5, alpha=0.07, color="grey",
-                   label="Pre-revision")
-
-        # Zero line
-        ax.axhline(0, color="black", linewidth=0.8, linestyle="--", alpha=0.5)
-
-        # Vertical line at revision
-        ax.axvline(0, color="grey", linewidth=1.0, linestyle=":", alpha=0.7)
-
-        # Plot CIs and points (skip baseline k = −1 from errorbars)
-        for k, b, se in zip(ks, betas, ses):
-            if k == -1:
-                ax.plot(k, 0, "s", color="grey", markersize=6, zorder=5)
-                continue
-            ax.errorbar(k, b, yerr=1.96 * se, fmt="o",
-                        color=color, markersize=5, linewidth=1.4,
-                        capsize=3, capthick=1.2, zorder=5)
-
-        # Connect points with a thin line (excluding baseline)
-        mask = ks != -1
-        sorted_idx = np.argsort(ks[mask])
-        ax.plot(ks[mask][sorted_idx], betas[mask][sorted_idx],
-                "-", color=color, linewidth=1.1, alpha=0.7, zorder=4)
-
-        ax.set_xlabel("Years relative to policy revision", fontsize=10)
-        ax.set_ylabel("Coefficient (log outcome)", fontsize=10)
-        ax.set_title(res["label"], fontsize=11, fontweight="bold", pad=8)
-        ax.set_xticks(range(-window, window + 1))
-        ax.tick_params(labelsize=9)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-
-    fig.suptitle(
-        f"Event Study: Patent Applications and Disclosures\n"
-        f"(window ±{window} years around first large positive PCI revision; "
-        f"baseline = year −1)",
-        fontsize=10, y=1.01
-    )
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=160, bbox_inches="tight")
-    plt.close()
-    print(f"  Figure saved -> {_display_path(out_path)}")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 6.  RANDOMIZATION INFERENCE
-# ─────────────────────────────────────────────────────────────────────────────
-
-def randomization_inference(df, outcome="ln_new_patent_apps",
-                             treatment="pci_l1", n_perms=2000):
-    """
-    Within-institution permutation test.
-    Permutes the PCI time series within each institution, destroying temporal
-    ordering while preserving distributional properties.
-    """
-    global LAST_RI_P
-    print("\n" + "=" * 74)
-    print(f"RANDOMIZATION INFERENCE  (seed={SEED}, n_perms={n_perms})")
-    print("=" * 74)
-    rng  = np.random.default_rng(SEED)
-    obs  = twfe(df, outcome, treatment)["beta"]
-
     cols = [outcome, treatment, *BASE_CONTROLS, "institution_id", "year"]
-    base = df[[c for c in cols if c in df.columns]].dropna().copy()
+    base = (df[[c for c in cols if c in df.columns]]
+            .dropna()
+            .sort_values(["institution_id", "year"])
+            .reset_index(drop=True))
+    rng = np.random.default_rng(SEED)
 
+    # Partial out controls and exact entity/year fixed effects once.  Batched
+    # matrix residualization then makes 2,000 permutations fast and exact.
+    nuisance = pd.concat([
+        base[list(BASE_CONTROLS)].astype(float),
+        pd.get_dummies(base["institution_id"].astype(str),
+                       prefix="inst", drop_first=True, dtype=float),
+        pd.get_dummies(base["year"].astype(int),
+                       prefix="yr", drop_first=True, dtype=float),
+    ], axis=1)
+    nuisance = sm.add_constant(nuisance, has_constant="add")
+    z = nuisance.to_numpy(dtype=float)
+    q, r, _ = linalg.qr(z, mode="economic", pivoting=True)
+    diag = np.abs(np.diag(r))
+    tol = np.finfo(float).eps * max(z.shape) * (diag.max() if len(diag) else 0)
+    rank = int(np.sum(diag > tol))
+    q = q[:, :rank]
+
+    def residualize(values):
+        return values - q @ (q.T @ values)
+
+    y_res = residualize(base[outcome].to_numpy(dtype=float))
+    observed_x = residualize(base[treatment].to_numpy(dtype=float))
+    obs = float(observed_x @ y_res / (observed_x @ observed_x))
+
+    x = base[treatment].to_numpy(dtype=float)
+    group_indices = [
+        np.asarray(idx)
+        for idx in base.groupby("institution_id", sort=False).indices.values()
+    ]
     perm_betas = []
-    for i in range(n_perms):
-        perm = base.copy()
-        perm[treatment] = perm.groupby("institution_id")[treatment].transform(
-            lambda s: rng.permutation(s.to_numpy())
-        )
-        b = twfe(perm, outcome, treatment)["beta"]
-        if not np.isnan(b):
-            perm_betas.append(b)
-        if (i + 1) % 500 == 0:
-            print(f"  ...{i + 1} permutations")
+    batch_size = min(100, n_perms)
+    completed = 0
+    while completed < n_perms:
+        width = min(batch_size, n_perms - completed)
+        x_perm = np.empty((len(base), width), dtype=float)
+        for j in range(width):
+            for idx in group_indices:
+                if len(idx) <= 1:
+                    x_perm[idx, j] = x[idx]
+                else:
+                    shift = int(rng.integers(1, len(idx)))
+                    x_perm[idx, j] = np.roll(x[idx], shift)
+        x_res = residualize(x_perm)
+        numer = y_res @ x_res
+        denom = np.sum(x_res * x_res, axis=0)
+        perm_betas.extend((numer / denom).tolist())
+        completed += width
+        if completed % 500 == 0 or completed == n_perms:
+            print(f"  ...{completed} permutations")
 
-    perm_betas = np.array(perm_betas)
-    ri_p = np.mean(np.abs(perm_betas) >= np.abs(obs))
-    LAST_RI_P = ri_p
+    perm_betas = np.asarray(perm_betas)
+    ri_p = ((np.sum(np.abs(perm_betas) >= np.abs(obs)) + 1)
+            / (len(perm_betas) + 1))
+    LAST_PLACEBO_P = ri_p
 
-    print(f"\n  Observed beta:       {obs:+.4f}")
-    print(f"  Permutations:        {len(perm_betas)}")
-    print(f"  RI p-value:          {ri_p:.4f}")
-    print(f"  Pct perm |beta| >= obs: {100 * ri_p:.2f}%")
+    print(f"\n  Observed beta:          {obs:+.4f}")
+    print(f"  Circular shifts:       {len(perm_betas)}")
+    print(f"  Placebo p-value:       {ri_p:.4f}")
+    print(f"  Pct shift |beta| >= obs: {100 * ri_p:.2f}%")
     return ri_p
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 7.  TABLE 3 — HETEROGENEITY + MUNDLAK
+# 6.  TABLE 3 — HETEROGENEITY
 # ─────────────────────────────────────────────────────────────────────────────
 
 def table3(df):
     print("\n" + "=" * 74)
-    print("TABLE 3: Heterogeneity and Mundlak Decomposition")
+    print("TABLE 3: Heterogeneity")
     print("=" * 74)
 
     SUBGROUPS = [
@@ -1020,31 +853,8 @@ def table3(df):
               f"{r2['beta']:>+10.3f}{_stars(r2['p']):<3} "
               f"{r2['se']:>7.3f} {r2['p']:>6.3f}")
 
-    MUNDLAK_OUTCOMES = [
-        ("ln_new_patent_apps", "Ln(Patent Applications)"),
-        ("ln_disclosures",     "Ln(Disclosures)"),
-        ("conv_rate",          "Conv. Rate"),
-        ("ln_licenses",        "Ln(Licenses)"),
-        ("ln_startups",        "Ln(Startups)"),
-        ("ln_license_income",  "Ln(License Income)"),
-    ]
-
-    print("\n  Panel B: Mundlak decomposition")
-    print(f"  {'Outcome':<30} {'Within b':>10} {'p':>6}  "
-          f"{'Between b':>10} {'p':>6}")
-    print("  " + "-" * 70)
-    for var, label in MUNDLAK_OUTCOMES:
-        if var not in df.columns:
-            continue
-        rw = twfe(df, var, treatment="pci_within")
-        rb = twfe(df, var, treatment="pci_mean")
-        print(f"  {label:<30} "
-              f"{rw['beta']:>+10.3f}{_stars(rw['p']):<3} {rw['p']:>6.3f}  "
-              f"{rb['beta']:>+10.3f}{_stars(rb['p']):<3} {rb['p']:>6.3f}")
-
-
 # ─────────────────────────────────────────────────────────────────────────────
-# 8.  TABLE 4 — CHANNEL ANALYSIS + MULTIPLE TESTING
+# 7.  TABLE 4 — CHANNEL ANALYSIS + MULTIPLE TESTING
 # ─────────────────────────────────────────────────────────────────────────────
 
 def table4(df):
@@ -1102,6 +912,7 @@ def table4(df):
         ("ln_total_patent_apps", "Ln(Total Patent Applications)"),
         ("ln_patents_issued",    "Ln(Patents Issued)"),
         ("ln_disclosures",       "Ln(Disclosures)"),
+        ("conv_rate",            "Applications - Disclosures"),
         ("ln_licenses",          "Ln(Licenses)"),
         ("ln_startups",          "Ln(Startups)"),
         ("ln_license_income",    "Ln(License Income)"),
@@ -1121,13 +932,13 @@ def table4(df):
         print("  " + "-" * 64)
         for lbl, rp, bp, bhp in zip(labels, raw_ps, bonf, bh):
             print(f"  {lbl:<38} {rp:>7.3f} {bp:>8.3f} {bhp:>7.3f}")
-        if LAST_RI_P is not None:
-            print(f"  Note: RI p-value for Ln(New Patent Applications) = {LAST_RI_P:.3f} "
+        if LAST_PLACEBO_P is not None:
+            print(f"  Note: circular-shift placebo p-value for Ln(New Patent Applications) = {LAST_PLACEBO_P:.3f} "
                   "(not subject to multiple comparison adjustment)")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 9.  APPENDIX TABLE A1 — CORRELATION MATRIX
+# 8.  APPENDIX TABLE A1 — CORRELATION MATRIX
 # ─────────────────────────────────────────────────────────────────────────────
 
 def appendix_a1(df):
@@ -1150,7 +961,7 @@ def appendix_a1(df):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 10. APPENDIX TABLE B1 — ROBUSTNESS SUITE
+# 9.  APPENDIX TABLE B1 — ROBUSTNESS SUITE
 # ─────────────────────────────────────────────────────────────────────────────
 
 def appendix_b1(df):
@@ -1204,15 +1015,8 @@ def appendix_b1(df):
         _row("With lagged outcome (Nickell-biased LB)",
              twfe(df, "ln_new_patent_apps",
                   controls=("ln_research_exp_l1", "ln_licensing_ftes_l1",
-                             "royalty_share_l1", "tlo_age_l1",
+                             "royalty_share_l1",
                              "ln_new_patent_apps_lag")))
-
-    # Quadratic time trend
-    _row("Common quadratic time trend",
-         twfe(df, "ln_new_patent_apps",
-              controls=("ln_research_exp_l1", "ln_licensing_ftes_l1",
-                        "royalty_share_l1", "tlo_age_l1",
-                        "year_dm", "year2_dm")))
 
     # Falsification: PCI → future research expenditure
     if "ln_research_exp_fwd" in df.columns:
@@ -1252,7 +1056,7 @@ def appendix_b1(df):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 11. APPENDIX TABLE B2 — LAG SENSITIVITY
+# 10. APPENDIX TABLE B2 — NEGATIVE-BINOMIAL ROBUSTNESS
 # ─────────────────────────────────────────────────────────────────────────────
 
 def appendix_b2(df):
@@ -1283,6 +1087,10 @@ def appendix_b2(df):
               f"{r['se']:>7.3f} {r['p']:>7.3f} {r['n']:>6,}")
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# 11. APPENDIX TABLE B3 — LAG SENSITIVITY
+# ──────────────────────────────────────────────────────────────────────
+
 def appendix_b3(df):
     print("\n" + "=" * 74)
     print("APPENDIX TABLE B3: Lag Sensitivity - All Outcomes")
@@ -1301,11 +1109,13 @@ def appendix_b3(df):
     LAGS = [("pci",    "Contemp."),
             ("pci_l1", "Lag 1"),
             ("pci_l2", "Lag 2"),
-            ("pci_l3", "Lag 3")]
+            ("pci_l3", "Lag 3"),
+            ("pci_l4", "Lag 4"),
+            ("pci_l5", "Lag 5")]
 
     hdr = f"  {'Outcome':<28}" + "".join(f"  {ln:>14}" for _, ln in LAGS)
     print(hdr)
-    print("  " + "-" * 86)
+    print("  " + "-" * 122)
 
     for var, label in OUTCOMES:
         if var not in df.columns:
@@ -1337,7 +1147,7 @@ if __name__ == "__main__":
     except FileNotFoundError:
         sys.exit(
             f"\nERROR: {DEFAULT_DATA_PATH} not found.\n"
-            "Run pipeline/01_build_merged_panel.py first.\n"
+            "Restore data/merged_autm.csv from the replication package.\n"
         )
 
     print(f"\nSample summary:")
@@ -1346,13 +1156,6 @@ if __name__ == "__main__":
     print(f"  Raw obs       :  {len(df):,}")
     if "pci" in df.columns:
         print(f"  Obs with PCI  :  {df['pci'].notna().sum():,}")
-    if "revision_year" in df.columns:
-        n_treated = df["revision_year"].notna().sum()
-        n_inst_t  = df.loc[
-            df["revision_year"].notna(), "institution_id"
-        ].nunique()
-        print(f"  Treated obs   :  {n_treated:,}  "
-              f"({n_inst_t} institutions with large positive revision)")
 
     # ── Tables ───────────────────────────────────────────────────────────────
     table1(df)
@@ -1360,23 +1163,10 @@ if __name__ == "__main__":
     table2(df)
     table3(df)
 
-    # ── Event Study ──────────────────────────────────────────────────────────
-    DEFAULT_FIGURE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    es_results = event_study(
-        df,
-        outcomes=[
-            ("ln_new_patent_apps", "Ln(New Patent Applications)"),
-            ("ln_disclosures",     "Ln(Disclosures)"),
-        ],
-        window=EVENT_WIN,
-        plot=True,
-        out_path=str(DEFAULT_FIGURE_PATH),
-    )
-
     # ── Randomization Inference ───────────────────────────────────────────────
-    # Set n_perms=200 for a quick check; use 2000 for paper
-    print("\n[Tip: set n_perms=200 for a quick check, 2000 for paper-quality RI]")
-    ri_p = randomization_inference(df, n_perms=2000)
+    # Set n_perms=200 for a quick check; use 2000 for the final package.
+    print("\n[Tip: set n_perms=200 for a quick check, 2000 for the final placebo test]")
+    placebo_p = circular_shift_placebo(df, n_perms=2000)
 
     # ── Channel + Multiple Testing ────────────────────────────────────────────
     table4(df)
@@ -1389,6 +1179,5 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 74)
     print("Replication complete.")
-    print(f"Event study figure -> {_display_path(DEFAULT_FIGURE_PATH)}")
     print("=" * 74)
 

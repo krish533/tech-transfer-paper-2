@@ -8,7 +8,6 @@ verified outputs for Paper 2.
 - `data/merged_autm.csv`: final analysis dataset
 - `code/replication.py`: complete statistical analysis
 - `code/run_all.py`: one-command replication runner
-- `paper_outputs/figures/figure1_event_study.png`: event-study figure
 - `paper_outputs/logs/replication_output.txt`: complete verified results
 - `requirements.txt`: Python dependencies
 
@@ -23,8 +22,8 @@ python -m pip install -r requirements.txt
 python code/run_all.py
 ```
 
-The runner reads the final dataset, executes all analyses, refreshes the
-event-study figure, and writes the complete console output to
+The runner reads the final dataset, executes all analyses, and writes the
+complete console output to
 `paper_outputs/logs/replication_output.txt`.
 
 The analysis can also be run directly:
@@ -56,13 +55,14 @@ sentence and word counts, source year, and carry-forward status.
 
 The primary specification uses lagged `Mean_Tone_Score` as the Policy
 Communication Index, institution and year fixed effects, institution-clustered
-standard errors, and lagged institutional controls.
+standard errors, and lagged institutional controls. Lags are matched by actual
+calendar year, and the fixed effects are absorbed exactly for the unbalanced
+estimation sample.
 
-The verified baseline estimate for log new patent applications is `0.524`
-(`SE = 0.501`, `p = 0.296`, `N = 2,289`). The 2,000-permutation
-randomization-inference p-value is `0.1105`.
+The verified baseline estimate for log new patent applications is `0.616`
+(`SE = 0.523`, `p = 0.241`, `N = 2,115`). The serial-correlation-preserving
+2,000-draw circular-shift placebo p-value is `0.1929`.
 
 The code also reproduces descriptive statistics, alternative outcomes, lag
-checks, heterogeneity estimates, a Mundlak decomposition, the event study,
-multiple-testing adjustments, leave-one-out estimates, and count-model
-robustness results.
+checks through five years, heterogeneity estimates, multiple-testing
+adjustments, leave-one-out estimates, and count-model robustness results.
