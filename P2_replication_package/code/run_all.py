@@ -7,21 +7,12 @@ from pathlib import Path
 
 def main() -> None:
     package_root = Path(__file__).resolve().parents[1]
-    pipeline_dir = package_root / "pipeline"
+    analysis_script = package_root / "code" / "replication.py"
     log_path = package_root / "paper_outputs" / "logs" / "replication_output.txt"
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    subprocess.run(
-        [sys.executable, str(pipeline_dir / "01_build_merged_panel.py")],
-        check=True,
-    )
-    subprocess.run(
-        [sys.executable, str(pipeline_dir / "02_validate_paper1_consistency.py")],
-        check=True,
-    )
-
     analysis = subprocess.run(
-        [sys.executable, str(pipeline_dir / "03_run_analysis.py")],
+        [sys.executable, str(analysis_script)],
         check=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -32,7 +23,7 @@ def main() -> None:
     if analysis.returncode:
         raise subprocess.CalledProcessError(
             analysis.returncode,
-            [sys.executable, str(pipeline_dir / "03_run_analysis.py")],
+            [sys.executable, str(analysis_script)],
         )
 
     print(

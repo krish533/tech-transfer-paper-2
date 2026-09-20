@@ -20,7 +20,7 @@ Produces ALL tables and figures in the paper:
 Requirements:
   pip install pandas numpy scipy statsmodels matplotlib
 
-Data file:  data/derived/merged_autm.csv
+Data file:  data/merged_autm.csv
 
 Column mapping (raw AUTM/PCI names → analysis names) is handled automatically.
 """
@@ -41,7 +41,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DATA_PATH = PACKAGE_ROOT / "data" / "derived" / "merged_autm.csv"
+DEFAULT_DATA_PATH = PACKAGE_ROOT / "data" / "merged_autm.csv"
 DEFAULT_FIGURE_PATH = PACKAGE_ROOT / "paper_outputs" / "figures" / "figure1_event_study.png"
 
 
