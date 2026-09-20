@@ -48,32 +48,32 @@ def sha256(path: Path) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    repo_dir = Path(__file__).resolve().parent
+    package_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
         description="Merge the frozen Paper 1 policy indices into the AUTM panel."
     )
     parser.add_argument(
         "--autm-input",
         type=Path,
-        default=repo_dir / "merged_autm (3).csv",
-        help="Base AUTM panel (default: merged_autm (3).csv).",
+        default=package_root / "data" / "raw" / "merged_autm_base.csv",
+        help="Base AUTM panel included in data/raw/.",
     )
     parser.add_argument(
         "--paper1-input",
         type=Path,
-        default=repo_dir / "data" / "paper1_policy_level_indices_institution_year.csv",
+        default=package_root / "data" / "external" / "paper1_policy_level_indices_institution_year.csv",
         help="Frozen Paper 1 institution-year indices included in this package.",
     )
     parser.add_argument(
         "--alias-map",
         type=Path,
-        default=repo_dir / "name_match_artifacts" / "paper2_pci_name_alias_map.json",
+        default=package_root / "pipeline" / "institution_aliases.json",
         help="Reviewed aliases for institution names that do not normalize exactly.",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=repo_dir / "merged_autm.csv",
+        default=package_root / "data" / "derived" / "merged_autm.csv",
         help="Updated Paper 2 analysis panel to create.",
     )
     return parser.parse_args()
@@ -81,7 +81,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    repo_dir = Path(__file__).resolve().parent
+    package_root = Path(__file__).resolve().parents[1]
     autm_path = args.autm_input.resolve()
     pci_path = args.paper1_input.resolve()
     alias_path = args.alias_map.resolve()
@@ -243,8 +243,8 @@ def main() -> int:
         "autm_input": autm_path.name,
         "autm_input_sha256": sha256(autm_path),
         "paper1_input": (
-            str(pci_path.relative_to(repo_dir))
-            if pci_path.is_relative_to(repo_dir)
+            pci_path.relative_to(package_root).as_posix()
+            if pci_path.is_relative_to(package_root)
             else str(pci_path)
         ),
         "paper1_input_sha256": sha256(pci_path),
@@ -268,10 +268,12 @@ def main() -> int:
         ),
     }
 
-    audit_path = repo_dir / "merged_autm_update_audit.json"
-    match_path = repo_dir / "merged_autm_match_audit.csv"
-    mapping_csv_path = repo_dir / "institution_name_mapping.csv"
-    mapping_json_path = repo_dir / "institution_name_mapping.json"
+    derived_dir = package_root / "data" / "derived"
+    derived_dir.mkdir(parents=True, exist_ok=True)
+    audit_path = derived_dir / "merged_autm_update_audit.json"
+    match_path = derived_dir / "merged_autm_match_audit.csv"
+    mapping_csv_path = derived_dir / "institution_name_mapping.csv"
+    mapping_json_path = derived_dir / "institution_name_mapping.json"
     audit_path.write_text(
         json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

@@ -151,7 +151,7 @@ EVENT STUDY: Pre/Post Coefficients Around Policy Revisions
 
   Pre-trend joint test (k=-4...-2): chi2(3) = 1.75,  p = 0.625  [PASS]
 
-  Figure saved -> figure1_event_study.png
+  Figure saved -> paper_outputs/figures/figure1_event_study.png
 
 [Tip: set n_perms=200 for a quick check, 2000 for paper-quality RI]
 
@@ -283,5 +283,5 @@ APPENDIX TABLE B3: Lag Sensitivity - All Outcomes
 
 ==========================================================================
 Replication complete.
-Event study figure -> figure1_event_study.png
+Event study figure -> paper_outputs/figures/figure1_event_study.png
 ==========================================================================

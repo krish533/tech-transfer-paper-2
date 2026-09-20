@@ -20,7 +20,7 @@ Produces ALL tables and figures in the paper:
 Requirements:
   pip install pandas numpy scipy statsmodels matplotlib
 
-Data file:  merged_autm.csv  (place in same directory)
+Data file:  data/derived/merged_autm.csv
 
 Column mapping (raw AUTM/PCI names → analysis names) is handled automatically.
 """
@@ -39,6 +39,17 @@ matplotlib.use("Agg")          # non-interactive backend for servers
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
+
+PACKAGE_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_DATA_PATH = PACKAGE_ROOT / "data" / "derived" / "merged_autm.csv"
+DEFAULT_FIGURE_PATH = PACKAGE_ROOT / "paper_outputs" / "figures" / "figure1_event_study.png"
+
+
+def _display_path(path):
+    try:
+        return Path(path).resolve().relative_to(PACKAGE_ROOT).as_posix()
+    except ValueError:
+        return str(path)
 
 SEED        = 42
 WIN_TRIM    = 0.01             # winsorize at 1st / 99th percentile
@@ -88,17 +99,18 @@ RENAME_MAP = {
 # 1.  DATA LOADING AND PREPARATION
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _resolve_data_path(path="merged_autm.csv"):
+def _resolve_data_path(path=None):
     """
-    Resolve the shipped data file in the repository directory.
+    Resolve the analysis data from the replication package.
     """
-    repo_dir = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
-    candidates = [repo_dir / path, repo_dir / "merged_autm.csv", repo_dir / "merged_autm (3).csv", Path(path)]
+    candidates = [DEFAULT_DATA_PATH]
+    if path is not None:
+        candidates.insert(0, Path(path))
     for candidate in candidates:
         if candidate.exists():
             return candidate
     raise FileNotFoundError(
-        "No AUTM/PCI merged CSV found. Expected merged_autm.csv or merged_autm (3).csv."
+        f"No AUTM/PCI merged CSV found. Expected {DEFAULT_DATA_PATH}."
     )
 
 
@@ -121,7 +133,7 @@ def _coerce_numeric_series(series):
     return pd.to_numeric(series, errors="coerce")
 
 
-def load_and_prepare(path="merged_autm.csv"):
+def load_and_prepare(path=None):
     """
     Load raw CSV, rename columns, build all derived variables.
     Returns a clean analysis-ready DataFrame.
@@ -919,7 +931,7 @@ def _plot_event_study(results, window, out_path):
     plt.tight_layout()
     plt.savefig(out_path, dpi=160, bbox_inches="tight")
     plt.close()
-    print(f"  Figure saved -> {out_path}")
+    print(f"  Figure saved -> {_display_path(out_path)}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1321,11 +1333,11 @@ if __name__ == "__main__":
     print("=" * 74)
 
     try:
-        df = load_and_prepare("merged_autm.csv")
+        df = load_and_prepare()
     except FileNotFoundError:
         sys.exit(
-            "\nERROR: merged_autm.csv not found.\n"
-            "Place the file in the working directory and re-run.\n"
+            f"\nERROR: {DEFAULT_DATA_PATH} not found.\n"
+            "Run pipeline/01_build_merged_panel.py first.\n"
         )
 
     print(f"\nSample summary:")
@@ -1349,6 +1361,7 @@ if __name__ == "__main__":
     table3(df)
 
     # ── Event Study ──────────────────────────────────────────────────────────
+    DEFAULT_FIGURE_PATH.parent.mkdir(parents=True, exist_ok=True)
     es_results = event_study(
         df,
         outcomes=[
@@ -1357,7 +1370,7 @@ if __name__ == "__main__":
         ],
         window=EVENT_WIN,
         plot=True,
-        out_path="figure1_event_study.png",
+        out_path=str(DEFAULT_FIGURE_PATH),
     )
 
     # ── Randomization Inference ───────────────────────────────────────────────
@@ -1376,6 +1389,6 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 74)
     print("Replication complete.")
-    print(f"Event study figure -> figure1_event_study.png")
+    print(f"Event study figure -> {_display_path(DEFAULT_FIGURE_PATH)}")
     print("=" * 74)
 

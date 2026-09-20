@@ -31,29 +31,29 @@ def sha256(path: Path) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    repo_dir = Path(__file__).resolve().parent
+    package_root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
         description="Check Paper 2 NLP values against the frozen Paper 1 panel."
     )
     parser.add_argument(
         "--paper1",
         type=Path,
-        default=repo_dir / "data" / "paper1_policy_level_indices_institution_year.csv",
+        default=package_root / "data" / "external" / "paper1_policy_level_indices_institution_year.csv",
     )
     parser.add_argument(
         "--paper2",
         type=Path,
-        default=repo_dir / "merged_autm.csv",
+        default=package_root / "data" / "derived" / "merged_autm.csv",
     )
     parser.add_argument(
         "--report",
         type=Path,
-        default=repo_dir / "validation" / "paper1_paper2_consistency.json",
+        default=package_root / "validation" / "paper1_paper2_consistency.json",
     )
     parser.add_argument(
         "--mismatches",
         type=Path,
-        default=repo_dir / "validation" / "paper1_paper2_mismatches.csv",
+        default=package_root / "validation" / "paper1_paper2_mismatches.csv",
     )
     parser.add_argument("--atol", type=float, default=1e-12)
     return parser.parse_args()
@@ -197,7 +197,13 @@ def main() -> int:
         f"{'PASS' if passed else 'FAIL'}: {len(comparable):,} comparable rows; "
         f"{total_mismatches:,} field mismatches; {unmatched_keys:,} missing Paper 1 keys."
     )
-    print(f"Report: {args.report}")
+    try:
+        report_display = args.report.resolve().relative_to(
+            Path(__file__).resolve().parents[1]
+        ).as_posix()
+    except ValueError:
+        report_display = str(args.report)
+    print(f"Report: {report_display}")
     return 0 if passed else 1
 
 

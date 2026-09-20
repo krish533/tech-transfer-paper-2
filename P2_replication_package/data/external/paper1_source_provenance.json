@@ -3,7 +3,7 @@
   "commit": "aa735a40a754f73496fffdaa1b0b771f606e713e",
   "commit_date": "2026-04-09T23:24:42-04:00",
   "source_path": "P1_replication_package/data/derived/policy_level_indices_institution_year.csv",
-  "packaged_path": "data/paper1_policy_level_indices_institution_year.csv",
+  "packaged_path": "data/external/paper1_policy_level_indices_institution_year.csv",
   "sha256": "d0050621c013ccce9568812134424bf4eb79771648a0f0ae77d0892c91273cea",
   "rows": 4296,
   "institutions": 150,
