@@ -31,6 +31,9 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
+import statsmodels.api as sm
+from statsmodels.discrete.discrete_model import NegativeBinomial
+from statsmodels.discrete.count_model import ZeroInflatedPoisson
 import matplotlib
 matplotlib.use("Agg")          # non-interactive backend for servers
 import matplotlib.pyplot as plt
@@ -40,10 +43,16 @@ warnings.filterwarnings("ignore")
 SEED        = 42
 WIN_TRIM    = 0.01             # winsorize at 1st / 99th percentile
 EVENT_WIN   = 4                # years before/after revision to show in event study
-# Revision threshold: abs(ΔPCI) must exceed this to count as a policy revision
+# Revision threshold: abs(dPCI) must exceed this to count as a policy revision
 # Set to 75th-percentile of non-trivial absolute changes ≈ 0.054
 REVISION_THRESHOLD = 0.05
 LAST_RI_P   = None
+BASE_CONTROLS = (
+    "ln_research_exp_l1",
+    "ln_licensing_ftes_l1",
+    "royalty_share_l1",
+    "tlo_age_l1",
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 0.  COLUMN RENAME MAP
@@ -157,7 +166,7 @@ def load_and_prepare(path="merged_autm.csv"):
     lag_src = [
         "pci", "pci_median",
         "tone_index", "clarity_index", "legal_load_index",
-        "ln_research_exp", "ln_licensing_ftes", "royalty_share",
+        "ln_research_exp", "ln_licensing_ftes", "royalty_share", "tlo_age",
     ]
     for v in lag_src:
         if v not in df.columns:
@@ -239,7 +248,7 @@ def _build_event_study_vars(df):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def twfe(df, outcome, treatment="pci_l1",
-         controls=("ln_research_exp_l1", "ln_licensing_ftes_l1"),
+         controls=BASE_CONTROLS,
          entity="institution_id", time="year",
          se_type="cluster",
          extra_regressors=()):
@@ -333,15 +342,277 @@ def twfe(df, outcome, treatment="pci_l1",
     # All coefficients (for event study / joint specs)
     all_betas = {v: beta_hat[i + 1] for i, v in enumerate(x_names)}
     all_ses   = {v: se_vec[i + 1]   for i, v in enumerate(x_names)}
+    all_ps    = {}
+    all_ci_lo = {}
+    all_ci_hi = {}
+    for v in x_names:
+        b_v = all_betas[v]
+        se_v = all_ses[v]
+        t_v = b_v / se_v if se_v > 0 else float("nan")
+        p_v = 2 * (1 - stats.t.cdf(abs(t_v), df=df_t)) if se_v > 0 else float("nan")
+        all_ps[v] = p_v
+        all_ci_lo[v] = b_v - 1.96 * se_v if se_v > 0 else float("nan")
+        all_ci_hi[v] = b_v + 1.96 * se_v if se_v > 0 else float("nan")
+
+    tss = np.sum((y - y.mean()) ** 2)
+    rss = np.sum(resid ** 2)
+    r2 = 1 - rss / tss if tss > 0 else float("nan")
 
     return dict(
         beta=b, se=se_b, p=p_val, n=n,
         ci_lo=b - 1.96 * se_b,
         ci_hi=b + 1.96 * se_b,
         t=t_stat,
+        r2=r2,
         all_betas=all_betas,
         all_ses=all_ses,
+        all_ps=all_ps,
+        all_ci_lo=all_ci_lo,
+        all_ci_hi=all_ci_hi,
     )
+
+
+def poisson_fe(df, outcome, treatment="pci_l1",
+               controls=BASE_CONTROLS,
+               entity="institution_id", time="year",
+               maxiter=200):
+    """
+    Estimate a Poisson pseudo-maximum-likelihood model with institution and
+    year fixed effects implemented via dummies and cluster-robust SEs.
+
+    Parameters
+    ----------
+    outcome   : str - raw count outcome, not log transformed
+    treatment : str - main regressor
+    controls  : tuple of str - controls to include
+
+    Returns
+    -------
+    dict with beta, se, p, n, ci_lo, ci_hi, converged
+    """
+    keep = [outcome, treatment, *controls, entity, time]
+    keep = [c for c in keep if c in df.columns]
+    sub = df[keep].dropna().copy()
+    if len(sub) < 20:
+        nan = float("nan")
+        return dict(beta=nan, se=nan, p=nan, n=0,
+                    ci_lo=nan, ci_hi=nan, converged=False)
+
+    rhs = [treatment, *controls]
+    X = sub[rhs].copy()
+    X = pd.concat([
+        X,
+        pd.get_dummies(sub[entity], prefix="inst", drop_first=True, dtype=float),
+        pd.get_dummies(sub[time].astype(int), prefix="yr", drop_first=True, dtype=float),
+    ], axis=1)
+    X = sm.add_constant(X, has_constant="add")
+    y = pd.to_numeric(sub[outcome], errors="coerce").astype(float)
+
+    res = sm.GLM(y, X, family=sm.families.Poisson()).fit(
+        cov_type="cluster",
+        cov_kwds={"groups": sub[entity]},
+        maxiter=maxiter,
+    )
+    b = res.params[treatment]
+    se_b = res.bse[treatment]
+    p_val = res.pvalues[treatment]
+    return dict(
+        beta=b, se=se_b, p=p_val, n=len(sub),
+        ci_lo=b - 1.96 * se_b,
+        ci_hi=b + 1.96 * se_b,
+        converged=bool(getattr(res, "converged", True)),
+    )
+
+
+def nb_fe(df, outcome, treatment="pci_l1",
+          controls=BASE_CONTROLS,
+          entity="institution_id", time="year",
+          maxiter=300):
+    """
+    Estimate a negative binomial FE model via entity and year dummies with
+    cluster-robust SEs.
+    """
+    keep = [outcome, treatment, *controls, entity, time]
+    keep = [c for c in keep if c in df.columns]
+    sub = df[keep].dropna().copy()
+    if len(sub) < 20:
+        nan = float("nan")
+        return dict(beta=nan, se=nan, p=nan, n=0,
+                    ci_lo=nan, ci_hi=nan, converged=False, alpha=nan)
+
+    rhs = [treatment, *controls]
+    X = sub[rhs].copy()
+    X = pd.concat([
+        X,
+        pd.get_dummies(sub[entity], prefix="inst", drop_first=True, dtype=float),
+        pd.get_dummies(sub[time].astype(int), prefix="yr", drop_first=True, dtype=float),
+    ], axis=1)
+    X = sm.add_constant(X, has_constant="add")
+    y = pd.to_numeric(sub[outcome], errors="coerce").astype(float)
+
+    res = NegativeBinomial(y, X).fit(
+        disp=0,
+        maxiter=maxiter,
+        cov_type="cluster",
+        cov_kwds={"groups": sub[entity]},
+    )
+    b = res.params[treatment]
+    se_b = res.bse[treatment]
+    p_val = res.pvalues[treatment]
+    return dict(
+        beta=b, se=se_b, p=p_val, n=len(sub),
+        ci_lo=b - 1.96 * se_b,
+        ci_hi=b + 1.96 * se_b,
+        converged=bool(getattr(res, "mle_retvals", {}).get("converged", True)),
+        alpha=res.params.get("alpha", float("nan")),
+    )
+
+
+def zip_fe(df, outcome, treatment="pci_l1",
+           controls=BASE_CONTROLS,
+           entity="institution_id", time="year",
+           maxiter=300):
+    """
+    Estimate a zero-inflated Poisson model with an intercept-only inflation
+    equation. This is included as a sensitivity check, not a preferred model,
+    because the main patent outcome has very little zero mass.
+    """
+    keep = [outcome, treatment, *controls, entity, time]
+    keep = [c for c in keep if c in df.columns]
+    sub = df[keep].dropna().copy()
+    if len(sub) < 20:
+        nan = float("nan")
+        return dict(beta=nan, se=nan, p=nan, n=0,
+                    ci_lo=nan, ci_hi=nan, converged=False,
+                    inflate_const=nan)
+
+    rhs = [treatment, *controls]
+    X = sub[rhs].copy()
+    X = pd.concat([
+        X,
+        pd.get_dummies(sub[entity], prefix="inst", drop_first=True, dtype=float),
+        pd.get_dummies(sub[time].astype(int), prefix="yr", drop_first=True, dtype=float),
+    ], axis=1)
+    X = sm.add_constant(X, has_constant="add")
+    y = pd.to_numeric(sub[outcome], errors="coerce").astype(float)
+    infl = pd.DataFrame({"inflate_const": 1.0}, index=sub.index)
+
+    res = ZeroInflatedPoisson(
+        endog=y,
+        exog=X,
+        exog_infl=infl,
+        inflation="logit",
+    ).fit(
+        method="bfgs",
+        maxiter=maxiter,
+        disp=0,
+        cov_type="cluster",
+        cov_kwds={"groups": sub[entity]},
+    )
+    b = res.params[treatment]
+    se_b = res.bse[treatment]
+    p_val = res.pvalues[treatment]
+    return dict(
+        beta=b, se=se_b, p=p_val, n=len(sub),
+        ci_lo=b - 1.96 * se_b,
+        ci_hi=b + 1.96 * se_b,
+        converged=bool(getattr(res, "mle_retvals", {}).get("converged", True)),
+        inflate_const=res.params.get("inflate_const", float("nan")),
+    )
+
+
+def zero_share_table(df):
+    """
+    Compute zero shares for the baseline lag-1 estimation sample of each
+    outcome. This directly addresses sensitivity of ln(1+y) transforms to
+    mass at zero.
+    """
+    outcomes = [
+        ("new_patent_apps",   "New Patent Applications"),
+        ("total_patent_apps", "Total Patent Applications"),
+        ("patents_issued",    "Patents Issued"),
+        ("disclosures",       "Invention Disclosures"),
+        ("licenses",          "Licenses Executed"),
+        ("startups",          "Startups Formed"),
+        ("license_income",    "License Income"),
+    ]
+    rows = []
+    required = ["pci_l1", *BASE_CONTROLS, "institution_id", "year"]
+    for var, label in outcomes:
+        cols = [var, *required]
+        cols = [c for c in cols if c in df.columns]
+        sub = df[cols].dropna().copy()
+        if len(sub) == 0:
+            continue
+        zeros = int((pd.to_numeric(sub[var], errors="coerce") == 0).sum())
+        rows.append(dict(
+            var=var,
+            label=label,
+            n=len(sub),
+            zeros=zeros,
+            zero_share=zeros / len(sub),
+        ))
+    return rows
+
+
+def table2_baseline_eq1(df):
+    """
+    Print a sequential Equation (1) baseline regression table for
+    ln(1 + new patent applications), using the common Equation (1)
+    sample across all specifications for comparability.
+    """
+    print("\n" + "=" * 74)
+    print("TABLE 2: Baseline Equation (1) - Ln(New Patent Applications)")
+    print("=" * 74)
+
+    common_cols = ["ln_new_patent_apps", "pci_l1", *BASE_CONTROLS, "institution_id", "year"]
+    sub = df[common_cols].dropna().copy()
+
+    specs = [
+        tuple(),
+        ("ln_research_exp_l1",),
+        ("ln_research_exp_l1", "ln_licensing_ftes_l1"),
+        ("ln_research_exp_l1", "ln_licensing_ftes_l1", "royalty_share_l1"),
+        BASE_CONTROLS,
+    ]
+    results = [twfe(sub, "ln_new_patent_apps", controls=s) for s in specs]
+
+    row_vars = [
+        ("pci_l1", "PCI$_{L1}$"),
+        ("ln_research_exp_l1", "Lagged ln(Research Exp.)"),
+        ("ln_licensing_ftes_l1", "Lagged ln(Licensing FTEs)"),
+        ("royalty_share_l1", "Lagged Inventor Royalty Share"),
+        ("tlo_age_l1", "Lagged TLO Age"),
+    ]
+
+    print("\n  Specification".ljust(34) + " (1)        (2)        (3)        (4)        (5)")
+    print("  " + "-" * 76)
+    for var, label in row_vars:
+        coef_line = f"  {label:<32}"
+        se_line = "  " + " " * 32
+        for r in results:
+            b = r["all_betas"].get(var, float("nan"))
+            se = r["all_ses"].get(var, float("nan"))
+            p = r["all_ps"].get(var, float("nan"))
+            if np.isnan(b):
+                coef_line += f"{'':>11}"
+                se_line += f"{'':>11}"
+            else:
+                coef_line += f"{(f'{b:+.3f}{_stars(p)}'):>11}"
+                se_line += f"{(f'({se:.3f})'):>11}"
+        print(coef_line)
+        print(se_line)
+
+    yesno = lambda included: "Yes" if included else "No"
+    print("  " + "-" * 76)
+    print(f"  {'Lagged ln(Research Exp.)':<32}" + "".join(f"{yesno('ln_research_exp_l1' in s):>11}" for s in specs))
+    print(f"  {'Lagged ln(Licensing FTEs)':<32}" + "".join(f"{yesno('ln_licensing_ftes_l1' in s):>11}" for s in specs))
+    print(f"  {'Lagged Royalty Share':<32}" + "".join(f"{yesno('royalty_share_l1' in s):>11}" for s in specs))
+    print(f"  {'Lagged TLO Age':<32}" + "".join(f"{yesno('tlo_age_l1' in s):>11}" for s in specs))
+    print(f"  {'Institution FE':<32}" + "".join(f"{'Yes':>11}" for _ in specs))
+    print(f"  {'Year FE':<32}" + "".join(f"{'Yes':>11}" for _ in specs))
+    print(f"  {'Observations':<32}" + "".join(f"{r['n']:>11,}" for r in results))
+    print(f"  {'R-squared':<32}" + "".join(f"{r['r2']:>11.3f}" for r in results))
 
 
 def _stars(p):
@@ -402,7 +673,7 @@ def table1(df):
         n_inst_rev = df.loc[
             df["pci_change"].abs() > REVISION_THRESHOLD, "institution_id"
         ].nunique()
-        print(f"\n  Policy revision events (|ΔPCI| > {REVISION_THRESHOLD:.3f}): "
+        print(f"\n  Policy revision events (|dPCI| > {REVISION_THRESHOLD:.3f}): "
               f"{n_rev} obs ({pct:.1f}%)  across {n_inst_rev} institutions")
 
 
@@ -440,7 +711,7 @@ def table2(df):
         print(f"  {label:<38} {r['beta']:>+9.3f}{_stars(r['p']):<3} "
               f"{r['se']:>7.3f} {r['p']:>7.3f} {ci:>18} {r['n']:>6,}")
 
-    print("\n  Panel B: Specification checks — Ln(New Patent Applications)")
+    print("\n  Panel B: Specification checks - Ln(New Patent Applications)")
     print(f"  {'Specification':<38} {'b':>9}  {'SE':>7} {'p':>7} {'N':>6}")
     print("  " + "-" * 72)
 
@@ -510,9 +781,9 @@ def event_study(df, outcomes=None, window=EVENT_WIN, plot=True,
     print("EVENT STUDY: Pre/Post Coefficients Around Policy Revisions")
     print("=" * 74)
     print(f"  Treated obs: {treated:,}  |  Treated institutions: {n_inst}")
-    print(f"  Revision threshold: |ΔPCI| > {REVISION_THRESHOLD:.3f}  "
+    print(f"  Revision threshold: |dPCI| > {REVISION_THRESHOLD:.3f}  "
           f"(positive revisions only)")
-    print(f"  Window: −{window} to +{window} years  |  Baseline: year −1\n")
+    print(f"  Window: -{window} to +{window} years  |  Baseline: year -1\n")
 
     all_results = {}
 
@@ -522,7 +793,7 @@ def event_study(df, outcomes=None, window=EVENT_WIN, plot=True,
 
         r = twfe(df, var,
                  treatment=event_dummies[0],
-                 controls=("ln_research_exp_l1", "ln_licensing_ftes_l1"),
+                 controls=BASE_CONTROLS,
                  extra_regressors=tuple(event_dummies[1:]))
 
         ks     = []
@@ -561,16 +832,16 @@ def event_study(df, outcomes=None, window=EVENT_WIN, plot=True,
             print(f"  {k:>5} {b:>+9.3f}{_stars(pv):<3} {se:>8.3f} "
                   f"{pv:>8.3f}  {ci}")
 
-        # Pre-trend joint test (k = −window … −2)
+        # Pre-trend joint test (k = -window ... -2)
         pre_ks    = [k for k in range(-window, -1)]
         pre_betas = [betas[k + window] for k in pre_ks]
         pre_ses   = [ses[k + window]   for k in pre_ks]
         if all(not np.isnan(b) and s > 0 for b, s in zip(pre_betas, pre_ses)):
             chi2 = sum((b / s) ** 2 for b, s in zip(pre_betas, pre_ses))
             pt   = 1 - stats.chi2.cdf(chi2, df=len(pre_ks))
+            status = "[PASS]" if pt > 0.10 else "[FAIL]"
             print(f"\n  Pre-trend joint test (k={pre_ks[0]}...{pre_ks[-1]}): "
-                  f"χ²({len(pre_ks)}) = {chi2:.2f},  p = {pt:.3f}"
-                  f"  {'[PASS ✓]' if pt > 0.10 else '[FAIL ✗]'}")
+                  f"chi2({len(pre_ks)}) = {chi2:.2f},  p = {pt:.3f}  {status}")
         print()
 
     # ── Figure ──────────────────────────────────────────────────────────────
@@ -648,7 +919,7 @@ def _plot_event_study(results, window, out_path):
     plt.tight_layout()
     plt.savefig(out_path, dpi=160, bbox_inches="tight")
     plt.close()
-    print(f"  Figure saved → {out_path}")
+    print(f"  Figure saved -> {out_path}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -669,8 +940,7 @@ def randomization_inference(df, outcome="ln_new_patent_apps",
     rng  = np.random.default_rng(SEED)
     obs  = twfe(df, outcome, treatment)["beta"]
 
-    cols = [outcome, treatment, "ln_research_exp_l1", "ln_licensing_ftes_l1",
-            "institution_id", "year"]
+    cols = [outcome, treatment, *BASE_CONTROLS, "institution_id", "year"]
     base = df[[c for c in cols if c in df.columns]].dropna().copy()
 
     perm_betas = []
@@ -771,7 +1041,7 @@ def table4(df):
     print("=" * 74)
 
     # Panel A: conversion rate
-    print("\n  Panel A: Conversion rate (Ln PatApp − Ln Discl)")
+    print("\n  Panel A: Conversion rate (Ln PatApp - Ln Discl)")
     if "conv_rate" in df.columns:
         r = twfe(df, "conv_rate")
         print(f"  PCI lag-1:  b = {r['beta']:+.3f}{_stars(r['p'])}"
@@ -791,7 +1061,7 @@ def table4(df):
         if out_var not in df.columns:
             continue
 
-        print(f"\n  Panel B — sequential sub-index, outcome: {out_label}")
+        print(f"\n  Panel B - sequential sub-index, outcome: {out_label}")
         print(f"  {'Sub-index':<28} {'b':>9}  {'SE':>7} {'p':>7} {'N':>6}")
         print("  " + "-" * 62)
         for tvar, tlabel in SUBIDX:
@@ -801,10 +1071,10 @@ def table4(df):
             print(f"  {tlabel:<28} {r['beta']:>+9.3f}{_stars(r['p']):<3} "
                   f"{r['se']:>7.3f} {r['p']:>7.3f} {r['n']:>6,}")
 
-        print(f"\n  Panel C — joint sub-index, outcome: {out_label}")
+        print(f"\n  Panel C - joint sub-index, outcome: {out_label}")
         print(f"  {'Sub-index':<28} {'b':>9}  {'SE':>7} {'p':>7}")
         print("  " + "-" * 54)
-        base_ctrl = ("ln_research_exp_l1", "ln_licensing_ftes_l1")
+        base_ctrl = BASE_CONTROLS
         for tvar, tlabel in SUBIDX:
             if tvar not in avail:
                 continue
@@ -893,7 +1163,8 @@ def appendix_b1(df):
     # Winsorized
     df_w = df.copy()
     for col in ["ln_new_patent_apps", "pci_l1",
-                "ln_research_exp_l1", "ln_licensing_ftes_l1"]:
+                "ln_research_exp_l1", "ln_licensing_ftes_l1",
+                "royalty_share_l1", "tlo_age_l1"]:
         if col not in df_w.columns:
             continue
         lo, hi = df_w[col].quantile([WIN_TRIM, 1 - WIN_TRIM])
@@ -905,7 +1176,7 @@ def appendix_b1(df):
     cnt  = df.groupby("institution_id")["year"].count()
     keep = cnt[cnt >= 15].index
     df_b = df[df["institution_id"].isin(keep)]
-    _row("Balanced panel (≥15 obs)", twfe(df_b, "ln_new_patent_apps"))
+    _row("Balanced panel (>=15 obs)", twfe(df_b, "ln_new_patent_apps"))
 
     # R1 only
     if "carnegie_r1" in df.columns:
@@ -921,18 +1192,20 @@ def appendix_b1(df):
         _row("With lagged outcome (Nickell-biased LB)",
              twfe(df, "ln_new_patent_apps",
                   controls=("ln_research_exp_l1", "ln_licensing_ftes_l1",
+                             "royalty_share_l1", "tlo_age_l1",
                              "ln_new_patent_apps_lag")))
 
     # Quadratic time trend
     _row("Common quadratic time trend",
          twfe(df, "ln_new_patent_apps",
               controls=("ln_research_exp_l1", "ln_licensing_ftes_l1",
+                        "royalty_share_l1", "tlo_age_l1",
                         "year_dm", "year2_dm")))
 
     # Falsification: PCI → future research expenditure
     if "ln_research_exp_fwd" in df.columns:
         rf = twfe(df, "ln_research_exp_fwd")
-        print(f"  {'Falsification: PCI → Ln(Future Res Exp)':<46} "
+        print(f"  {'Falsification: PCI -> Ln(Future Res Exp)':<46} "
               f"{rf['beta']:>+9.3f}{_stars(rf['p']):<3} "
               f"{rf['se']:>7.3f} {rf['p']:>7.3f} {rf['n']:>6,}")
 
@@ -958,7 +1231,7 @@ def appendix_b1(df):
     _row("Baseline (lag-1 PCI)", twfe(df, "conv_rate"))
     _row(f"Winsorized {int(100*WIN_TRIM)}st/99th percentiles",
          twfe(df_w, "conv_rate"))
-    _row("Balanced panel (≥15 obs)", twfe(df_b, "conv_rate"))
+    _row("Balanced panel (>=15 obs)", twfe(df_b, "conv_rate"))
     if "carnegie_r1" in df.columns:
         _row("R1 universities only",
              twfe(df[df["carnegie_r1"] == 1], "conv_rate"))
@@ -972,7 +1245,35 @@ def appendix_b1(df):
 
 def appendix_b2(df):
     print("\n" + "=" * 74)
-    print("APPENDIX TABLE B2: Lag Sensitivity — All Outcomes")
+    print("APPENDIX TABLE B2: Negative Binomial Robustness for New Patent Applications")
+    print("=" * 74)
+
+    no_ctrl = df[["new_patent_apps", "pci_l1", "institution_id", "year"]].dropna()
+    with_ctrl = df[[
+        "new_patent_apps", "pci_l1", *BASE_CONTROLS, "institution_id", "year"
+    ]].dropna()
+    print("\n  Outcome distribution (baseline samples for New Patent Applications)")
+    print(f"  No-controls sample:    N = {len(no_ctrl):,}, mean = {no_ctrl['new_patent_apps'].mean():.2f}, "
+          f"variance = {no_ctrl['new_patent_apps'].var():.2f}, "
+          f"variance/mean = {no_ctrl['new_patent_apps'].var() / no_ctrl['new_patent_apps'].mean():.2f}")
+    print(f"  With-controls sample:  N = {len(with_ctrl):,}, mean = {with_ctrl['new_patent_apps'].mean():.2f}, "
+          f"variance = {with_ctrl['new_patent_apps'].var():.2f}, "
+          f"variance/mean = {with_ctrl['new_patent_apps'].var() / with_ctrl['new_patent_apps'].mean():.2f}")
+
+    print("\n  Panel A: PCI coefficient across negative binomial specifications")
+    print(f"  {'Controls':<14} {'b':>9}  {'SE':>7} {'p':>7} {'N':>6}")
+    print("  " + "-" * 54)
+    for use_ctrl in [False, True]:
+        ctrls = BASE_CONTROLS if use_ctrl else tuple()
+        r = nb_fe(df, "new_patent_apps", controls=ctrls)
+        ctrl_label = "With controls" if use_ctrl else "No controls"
+        print(f"  {ctrl_label:<14} {r['beta']:>+9.3f}{_stars(r['p']):<3} "
+              f"{r['se']:>7.3f} {r['p']:>7.3f} {r['n']:>6,}")
+
+
+def appendix_b3(df):
+    print("\n" + "=" * 74)
+    print("APPENDIX TABLE B3: Lag Sensitivity - All Outcomes")
     print("=" * 74)
 
     OUTCOMES = [
@@ -1015,7 +1316,7 @@ def appendix_b2(df):
 if __name__ == "__main__":
 
     print("=" * 74)
-    print("REPLICATION — Policy Communication and Technology Transfer")
+    print("REPLICATION - Policy Communication and Technology Transfer")
     print("Sharma, Wang, Basnet, Cossco (2026)")
     print("=" * 74)
 
@@ -1029,7 +1330,7 @@ if __name__ == "__main__":
 
     print(f"\nSample summary:")
     print(f"  Institutions  :  {df['institution_id'].nunique()}")
-    print(f"  Year range    :  {df['year'].min()} – {df['year'].max()}")
+    print(f"  Year range    :  {df['year'].min()} - {df['year'].max()}")
     print(f"  Raw obs       :  {len(df):,}")
     if "pci" in df.columns:
         print(f"  Obs with PCI  :  {df['pci'].notna().sum():,}")
@@ -1043,6 +1344,7 @@ if __name__ == "__main__":
 
     # ── Tables ───────────────────────────────────────────────────────────────
     table1(df)
+    table2_baseline_eq1(df)
     table2(df)
     table3(df)
 
@@ -1070,9 +1372,10 @@ if __name__ == "__main__":
     appendix_a1(df)
     appendix_b1(df)
     appendix_b2(df)
+    appendix_b3(df)
 
     print("\n" + "=" * 74)
     print("Replication complete.")
-    print(f"Event study figure → figure1_event_study.png")
+    print(f"Event study figure -> figure1_event_study.png")
     print("=" * 74)
 

@@ -1,0 +1,287 @@
+==========================================================================
+REPLICATION - Policy Communication and Technology Transfer
+Sharma, Wang, Basnet, Cossco (2026)
+==========================================================================
+
+Sample summary:
+  Institutions  :  253
+  Year range    :  1991 - 2023
+  Raw obs       :  3,507
+  Obs with PCI  :  2,564
+  Treated obs   :  398  (18 institutions with large positive revision)
+
+==========================================================================
+TABLE 1: Descriptive Statistics
+==========================================================================
+
+  Variable                                   Mean       SD      Min      Max       N
+  --------------------------------------------------------------------------------
+
+  Panel A: Policy Communication Index
+    PCI (Mean Tone Score)                     0.4      0.1      0.3      0.7   2,564
+    Tone Index                                0.0      0.5     -1.7      4.4   2,564
+    Clarity Index                             0.0      0.6     -1.9      1.8   2,564
+    Legal Load Index                          0.0      0.7     -1.4      3.2   2,564
+
+  Panel B: Technology Transfer Outcomes
+    New Patent Applications                  70.6    113.7      0.0   1532.0   3,507
+    Invention Disclosures                   122.4    157.7      0.0   1726.0   3,507
+    Licenses Executed                        38.3     66.9      0.0   1387.0   3,489
+    Startups Formed                           4.6      7.1      0.0    102.0   3,245
+    License Income ($000)                11880770.3 46747240.4     80.0 1258637000.0   3,507
+
+  Panel C: Institutional Characteristics
+    Total Research Exp ($M)                 333.0    478.1      1.2   7500.0   3,507
+    Licensing FTEs                            5.5      7.3      0.0     95.0   3,401
+    Royalty Share (%)                        39.7      8.1     15.0     65.0   3,507
+    TLO Age (years)                          23.0     15.5    -11.0     97.0   3,507
+
+  Policy revision events (|dPCI| > 0.050): 53 obs (2.3%)  across 42 institutions
+
+==========================================================================
+TABLE 2: Baseline Equation (1) - Ln(New Patent Applications)
+==========================================================================
+
+  Specification                   (1)        (2)        (3)        (4)        (5)
+  ----------------------------------------------------------------------------
+  PCI$_{L1}$                           -0.127     +0.112     +0.210     +0.211     +0.524
+                                      (0.551)    (0.472)    (0.472)    (0.468)    (0.501)
+  Lagged ln(Research Exp.)                     +0.641***  +0.543***  +0.554***  +0.279***
+                                                 (0.052)    (0.066)    (0.067)    (0.095)
+  Lagged ln(Licensing FTEs)                               +0.215***  +0.214***    +0.138*
+                                                            (0.072)    (0.071)    (0.071)
+  Lagged Inventor Royalty Share                                         +0.005     +0.004
+                                                                       (0.005)    (0.005)
+  Lagged TLO Age                                                                +0.025***
+                                                                                  (0.004)
+  ----------------------------------------------------------------------------
+  Lagged ln(Research Exp.)                 No        Yes        Yes        Yes        Yes
+  Lagged ln(Licensing FTEs)                No         No        Yes        Yes        Yes
+  Lagged Royalty Share                     No         No         No        Yes        Yes
+  Lagged TLO Age                           No         No         No         No        Yes
+  Institution FE                          Yes        Yes        Yes        Yes        Yes
+  Year FE                                 Yes        Yes        Yes        Yes        Yes
+  Observations                          2,289      2,289      2,289      2,289      2,289
+  R-squared                             0.000      0.148      0.160      0.161      0.187
+
+==========================================================================
+TABLE 2: Main Regression Results
+==========================================================================
+
+  Panel A: TWFE, PCI lagged one year, seven independent outcomes
+  Outcome                                        b       SE       p             95% CI      N
+  ----------------------------------------------------------------------------------------
+  Ln(New Patent Applications)               +0.524      0.501   0.296   [-0.457, +1.506]  2,289
+  Ln(Total Patent Applications)             +0.682      0.508   0.181   [-0.314, +1.678]  2,258
+  Ln(Patents Issued)                        +0.828      0.527   0.117   [-0.204, +1.860]  2,268
+  Ln(Disclosures)                           -0.387      0.379   0.309   [-1.131, +0.356]  2,289
+  Ln(Licenses)                              +0.546      0.441   0.216   [-0.317, +1.410]  2,281
+  Ln(Startups)                              +0.266      0.504   0.598   [-0.721, +1.254]  2,246
+  Ln(License Income)                        +0.506      1.088   0.643   [-1.627, +2.638]  2,289
+
+  Panel B: Specification checks - Ln(New Patent Applications)
+  Specification                                  b       SE       p      N
+  ------------------------------------------------------------------------
+  Contemporaneous PCI                       +0.124      0.530   0.816  2,377
+  Baseline: lag-1 PCI                       +0.524      0.501   0.296  2,289
+  Lag-2 PCI                                 +0.723      0.557   0.196  2,085
+  Lag-3 PCI                                 +0.471      0.510   0.358  1,878
+  Median PCI (lagged)                       +0.369      0.535   0.491  2,289
+
+==========================================================================
+TABLE 3: Heterogeneity and Mundlak Decomposition
+==========================================================================
+
+  Panel A: Split-sample heterogeneity
+  Subgroup                  PatApps b      SE      p  ConvRate b      SE      p
+  ------------------------------------------------------------------------------------
+  Private                      +1.847*     1.006  0.071      +2.471**    1.166  0.038
+  Public                       +0.389      0.582  0.505      +0.683      0.490  0.165
+  Carnegie R1                  +0.756      0.565  0.182      +1.081*     0.587  0.067
+  Non-R1                       -0.006      0.647  0.992      +0.856*     0.426  0.055
+  Medical School               +0.478      0.516  0.356      +0.949*     0.494  0.056
+  No Medical School            -0.522      1.722  0.763      -1.054      1.177  0.376
+  Land Grant                   +0.066      0.654  0.920      +0.581      0.414  0.165
+  Non-Land-Grant               +1.203*     0.622  0.055      +1.428*     0.739  0.055
+
+  Panel B: Mundlak decomposition
+  Outcome                          Within b      p   Between b      p
+  ----------------------------------------------------------------------
+  Ln(Patent Applications)            +0.664     0.192      -7.156     0.188
+  Ln(Disclosures)                    -0.316     0.406      -1.371     0.744
+  Conv. Rate                         +0.979**   0.036      -5.784     0.222
+  Ln(Licenses)                       +0.738*    0.097      +1.856     0.782
+  Ln(Startups)                       +0.273     0.595      -6.411     0.209
+  Ln(License Income)                 +0.335     0.760     +12.409     0.343
+
+==========================================================================
+EVENT STUDY: Pre/Post Coefficients Around Policy Revisions
+==========================================================================
+  Treated obs: 398  |  Treated institutions: 18
+  Revision threshold: |dPCI| > 0.050  (positive revisions only)
+  Window: -4 to +4 years  |  Baseline: year -1
+
+  Ln(New Patent Applications)  (N = 3,158)
+      k      beta       SE        p  CI
+  ----------------------------------------------------
+     -4    -0.202       0.124    0.122  [-0.445, +0.041]
+     -3    -0.103       0.099    0.313  [-0.297, +0.091]
+     -2    -0.081       0.101    0.435  [-0.280, +0.118]
+     -1   (baseline = 0)
+      0    -0.051       0.141    0.721  [-0.327, +0.225]
+      1    -0.055       0.125    0.666  [-0.299, +0.190]
+      2    -0.048       0.187    0.800  [-0.415, +0.319]
+      3    +0.041       0.154    0.792  [-0.260, +0.342]
+      4    -0.294**     0.138    0.048  [-0.565, -0.024]
+
+  Pre-trend joint test (k=-4...-2): chi2(3) = 4.37,  p = 0.224  [PASS]
+
+  Ln(Disclosures)  (N = 3,158)
+      k      beta       SE        p  CI
+  ----------------------------------------------------
+     -4    -0.111       0.140    0.440  [-0.386, +0.164]
+     -3    +0.020       0.100    0.846  [-0.177, +0.217]
+     -2    +0.091       0.087    0.311  [-0.080, +0.262]
+     -1   (baseline = 0)
+      0    -0.012       0.108    0.916  [-0.222, +0.199]
+      1    -0.013       0.100    0.902  [-0.209, +0.184]
+      2    +0.039       0.095    0.684  [-0.147, +0.226]
+      3    -0.027       0.135    0.841  [-0.293, +0.238]
+      4    -0.166       0.163    0.322  [-0.486, +0.153]
+
+  Pre-trend joint test (k=-4...-2): chi2(3) = 1.75,  p = 0.625  [PASS]
+
+  Figure saved -> figure1_event_study.png
+
+[Tip: set n_perms=200 for a quick check, 2000 for paper-quality RI]
+
+==========================================================================
+RANDOMIZATION INFERENCE  (seed=42, n_perms=2000)
+==========================================================================
+  ...500 permutations
+  ...1000 permutations
+  ...1500 permutations
+  ...2000 permutations
+
+  Observed beta:       +0.5242
+  Permutations:        2000
+  RI p-value:          0.1105
+  Pct perm |beta| >= obs: 11.05%
+
+==========================================================================
+TABLE 4: Channel Analysis and Multiple Testing
+==========================================================================
+
+  Panel A: Conversion rate (Ln PatApp - Ln Discl)
+  PCI lag-1:  b = +0.911*  SE = 0.466  p = 0.052  N = 2,289
+
+  Panel B - sequential sub-index, outcome: Ln(New Patent Applications)
+  Sub-index                            b       SE       p      N
+  --------------------------------------------------------------
+  Tone Index                      +0.029      0.071   0.680  2,289
+  Clarity Index                   -0.128      0.082   0.118  2,289
+  Legal Load Index                -0.003      0.065   0.958  2,289
+
+  Panel C - joint sub-index, outcome: Ln(New Patent Applications)
+  Sub-index                            b       SE       p
+  ------------------------------------------------------
+  Tone Index                      +0.060      0.074   0.418
+  Clarity Index                   -0.142*     0.084   0.091
+  Legal Load Index                -0.010      0.063   0.875
+
+  Panel B - sequential sub-index, outcome: Conversion Rate
+  Sub-index                            b       SE       p      N
+  --------------------------------------------------------------
+  Tone Index                      -0.006      0.059   0.918  2,289
+  Clarity Index                   -0.082      0.063   0.195  2,289
+  Legal Load Index                +0.025      0.056   0.650  2,289
+
+  Panel C - joint sub-index, outcome: Conversion Rate
+  Sub-index                            b       SE       p
+  ------------------------------------------------------
+  Tone Index                      +0.014      0.061   0.821
+  Clarity Index                   -0.083      0.068   0.226
+  Legal Load Index                +0.021      0.055   0.710
+
+  Panel D: Multiple testing corrections
+  Outcome                                  Raw p    Bonf.      BH
+  ----------------------------------------------------------------
+  Ln(New Patent Applications)              0.296    1.000   0.432
+  Ln(Total Patent Applications)            0.181    1.000   0.432
+  Ln(Patents Issued)                       0.117    0.821   0.432
+  Ln(Disclosures)                          0.309    1.000   0.432
+  Ln(Licenses)                             0.216    1.000   0.432
+  Ln(Startups)                             0.598    1.000   0.643
+  Ln(License Income)                       0.643    1.000   0.643
+  Note: RI p-value for Ln(New Patent Applications) = 0.111 (not subject to multiple comparison adjustment)
+
+==========================================================================
+APPENDIX TABLE A1: Sub-Index Correlation Matrix (lagged one year)
+==========================================================================
+
+                           PCI        Tone     Clarity  Legal Load
+  PCI                    1.000       0.432       0.026       0.192
+  Tone                   0.432       1.000       0.147      -0.014
+  Clarity                0.026       0.147       1.000      -0.171
+  Legal Load             0.192      -0.014      -0.171       1.000
+
+==========================================================================
+APPENDIX TABLE B1: Robustness Suite
+==========================================================================
+
+  Panel A: Ln(New Patent Applications)
+  Specification                                          b       SE       p      N
+  ----------------------------------------------------------------------------
+  Baseline (lag-1 PCI)                              +0.524      0.501   0.296  2,289
+  Winsorized 1st/99th percentiles                   +0.740      0.577   0.201  2,289
+  Balanced panel (>=15 obs)                         +0.536      0.612   0.383  1,935
+  R1 universities only                              +0.756      0.565   0.182  2,008
+  HC3 standard errors                               +0.524*     0.305   0.085  2,289
+  With lagged outcome (Nickell-biased LB)           +0.429      0.301   0.156  2,289
+  Common quadratic time trend                       +0.516      0.498   0.301  2,289
+  Falsification: PCI -> Ln(Future Res Exp)          +0.463***   0.175   0.009  2,075
+
+  Leave-one-out range:   [0.248, 0.781]  (N = 253 institutions)
+  Pct positive:          100.0%
+
+  Panel B: Conversion Rate
+  Specification                                          b       SE       p      N
+  ----------------------------------------------------------------------------
+  Baseline (lag-1 PCI)                              +0.911*     0.466   0.052  2,289
+  Winsorized 1st/99th percentiles                   +1.156**    0.565   0.042  2,289
+  Balanced panel (>=15 obs)                         +0.980*     0.552   0.079  1,935
+  R1 universities only                              +1.081*     0.587   0.067  2,008
+  Lag-2 PCI                                         +1.191**    0.481   0.014  2,085
+
+==========================================================================
+APPENDIX TABLE B2: Negative Binomial Robustness for New Patent Applications
+==========================================================================
+
+  Outcome distribution (baseline samples for New Patent Applications)
+  No-controls sample:    N = 2,328, mean = 81.39, variance = 16446.76, variance/mean = 202.06
+  With-controls sample:  N = 2,289, mean = 81.99, variance = 16559.13, variance/mean = 201.97
+
+  Panel A: PCI coefficient across negative binomial specifications
+  Controls               b       SE       p      N
+  ------------------------------------------------------
+  No controls       +0.536      0.553   0.332  2,328
+  With controls     +0.412      0.531   0.437  2,289
+
+==========================================================================
+APPENDIX TABLE B3: Lag Sensitivity - All Outcomes
+==========================================================================
+  Outcome                             Contemp.           Lag 1           Lag 2           Lag 3
+  --------------------------------------------------------------------------------------
+  Ln(New Patent Apps)                   +0.124          +0.524          +0.723          +0.471
+  Ln(Total Patent Apps)                 +0.478          +0.682          +0.593          +0.370
+  Ln(Patents Issued)                    +0.344          +0.828        +1.065**         +1.111*
+  Ln(Disclosures)                       -0.462          -0.387          -0.468          -0.496
+  Conv. Rate                            +0.586         +0.911*        +1.191**        +0.966**
+  Ln(Licenses)                          +0.382          +0.546          +0.348          -0.149
+  Ln(Startups)                          +0.187          +0.266          -0.167          -0.749
+  Ln(License Income)                    +0.530          +0.506          +0.536          +0.552
+
+==========================================================================
+Replication complete.
+Event study figure -> figure1_event_study.png
+==========================================================================

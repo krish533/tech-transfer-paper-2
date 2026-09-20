@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "absolute_tolerance": 1e-12,
+  "paper1": {
+    "file": "paper1_policy_level_indices_institution_year.csv",
+    "sha256": "d0050621c013ccce9568812134424bf4eb79771648a0f0ae77d0892c91273cea",
+    "rows": 4296,
+    "institutions": 150,
+    "year_min": 1925,
+    "year_max": 2025,
+    "duplicate_institution_year_keys": 0
+  },
+  "paper2": {
+    "file": "merged_autm.csv",
+    "sha256": "d0776a261103f828bbdf59af301fd871f460c82781d621f8217f54fb36dc4a86",
+    "rows": 3507,
+    "institutions": 149,
+    "year_min": 1991,
+    "year_max": 2023,
+    "duplicate_institution_year_keys": 0,
+    "rows_with_nlp_score": 2564,
+    "rows_without_nlp_score": 943,
+    "institutions_with_any_nlp_score": 139,
+    "institutions_without_any_nlp_score": [
+      "Cornell University",
+      "Louisiana State University",
+      "Loyola University Medical Center",
+      "Massachusetts Inst. of Technology (MIT)",
+      "Medical College of Ohio",
+      "Northwestern University",
+      "University of Maryland College Park",
+      "University of Massachusetts Medical Center (UMass Chan Medical School)",
+      "University of New Mexico",
+      "University of New Orleans"
+    ]
+  },
+  "comparison": {
+    "comparable_rows": 2564,
+    "paper1_keys_not_found": 0,
+    "total_field_mismatches": 0,
+    "fields": {
+      "Mean_Tone_Score": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Median_Tone_Score": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Tone_Index": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Clarity_Index": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Legal_Load_Index": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "n_sentences": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "n_words": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Source_Year": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      },
+      "Is_Carried_Forward": {
+        "compared_rows": 2564,
+        "mismatch_rows": 0,
+        "max_absolute_difference": 0.0
+      }
+    }
+  }
+}

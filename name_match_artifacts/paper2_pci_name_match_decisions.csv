@@ -1,0 +1,11 @@
+﻿autm_institution,match_status,matched_pci_institution,confidence,reason
+Cornell University,no_match,,high,None of the PCI candidates is Cornell University or an obvious variant of it.
+Massachusetts Inst. of Technology (MIT),no_match,,high,No PCI candidate is Massachusetts Institute of Technology/MIT; other 'Institute of Technology' institutions are distinct entities.
+New York University Medical Center,match,New York University,medium,"New York University Medical Center is the medical center of NYU, and the PCI panel appears to list the parent institution rather than the medical center separately."
+Northwestern University,no_match,,high,None of the PCI candidates is Northwestern University or an obvious institutional variant.
+University of Arkansas Fayetteville,match,University of Arkansas,medium,University of Arkansas Fayetteville refers to the flagship campus commonly identified simply as the University of Arkansas.
+University of Illinois at Urbana-Champaign,match,University of Illinois Urbana Champaign,high,"This is a straightforward naming variant of the same campus, differing only by punctuation and omission of 'at'."
+University of North Carolina at Chapel Hill,match,University of North Carolina Chapel Hill,high,This is the same institution with a minor naming variant omitting 'at'.
+University of Texas Health Science Center Houston,match,University of Texas Houston Hlth. Sci. Ctr_,high,This is an obvious abbreviation/word-order variant of the same UT health science center in Houston.
+University of Texas Health Science Center at San Antonio,match,University of Texas Hlth Sci Ctr San Antonio,high,This is an obvious abbreviated variant of the same UT health science center in San Antonio.
+University of Texas Southwestern Medical Center,match,University of Texas Southwestern Med. Ctr_,high,This is the same institution with 'Medical Center' abbreviated as 'Med. Ctr_'.
