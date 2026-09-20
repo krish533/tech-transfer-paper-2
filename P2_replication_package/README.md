@@ -1,7 +1,7 @@
 # Paper 2 Replication Package
 
 This package reproduces the Paper 2 analysis from the base AUTM panel and the
-frozen Paper 1 policy-index panel. It contains the complete data chain,
+Paper 1 policy-index panel. It contains the complete data chain,
 cross-paper consistency checks, analysis code, and verified outputs.
 
 ## Package structure
@@ -44,9 +44,7 @@ cross-paper consistency checks, analysis code, and verified outputs.
 - frozen Paper 1 institutions: `150`
 - frozen Paper 1 panel years: `1925-2025`
 
-The Paper 2 panel contains 253 AUTM unit identifiers. Several units map to the
-same standardized institution name, which is why the unit count differs from
-the 149 institution-name count.
+The Paper 2 panel contains 253 AUTM unit identifiers.
 
 ## How to run
 
@@ -92,7 +90,7 @@ outcomes, institutional characteristics, royalty-sharing variables, and the
 older policy-index merge. The build pipeline preserves its AUTM variables and
 replaces all Paper 1-derived NLP fields with the frozen current Paper 1 values.
 
-### 2. Frozen Paper 1 policy indices
+### 2. Paper 1 policy indices
 
 File:
 
@@ -149,12 +147,8 @@ institution-year row.
 
 The main NLP score (`Mean_Tone_Score`), median score, all three sub-indices,
 sentence/word counts, source year, and carry-forward flag are therefore exactly
-consistent with the frozen Paper 1 data.
+consistent with the Paper 1 data.
 
-Three Paper 2 institutions have no Paper 1 name match: Cornell University,
-MIT, and Northwestern University. Seven additional institutions have a name
-match but no overlapping AUTM/policy year. Full coverage details are in
-`data/derived/institution_name_mapping.csv`.
 
 The validator exits with a nonzero status if it finds a duplicate key, missing
 upstream key, or value mismatch. It writes:
