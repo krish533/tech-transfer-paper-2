@@ -1,0 +1,26 @@
+\begin{table}[htbp]
+\caption{Mechanism Analysis: Granular Text Features}
+\label{tab:mechanism}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Feature & \multicolumn{2}{c}{Conversion Rate} & \multicolumn{2}{c}{Ln(Patent Apps)} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & $\beta$ & $p$ & $\beta$ & $p$ \\
+\midrule
+  Supportive terms (per 1,000w) & +0.017 & 0.540 & +0.008 & 0.745 \\
+  Restrictive terms (per 1,000w) & +0.003 & 0.562 & -0.006 & 0.329 \\
+  Sanction terms (per 1,000w) & +0.018 & 0.870 & +0.081 & 0.452 \\
+  Second-person pronouns (per 1,000w) & +0.130 & 0.165 & +0.052 & 0.498 \\
+  Inclusive 'we' (per 1,000w) & -0.038 & 0.183 & -0.041 & 0.296 \\
+  Obligation modal share & +0.180 & 0.690 & -0.444 & 0.343 \\
+  Mean sentence length (words) & +0.004 & 0.443 & +0.005 & 0.445 \\
+  Long-sentence share & +0.141 & 0.634 & +0.263 & 0.572 \\
+  Procedural cue share & +1.858 & 0.105 & +1.505 & 0.204 \\
+  Legalese terms (per 1,000w) & -0.026 & 0.556 & +0.007 & 0.864 \\
+  IP/tech terms (per 1,000w) & +0.004 & 0.177 & +0.000 & 0.906 \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize All specifications include institution and year FE, clustered SEs.}\\
+\multicolumn{5}{l}{\footnotesize Sentence-length rows exclude ECU 2021--23 parsing artifact.}\\
+\end{tabular}
+\end{table}

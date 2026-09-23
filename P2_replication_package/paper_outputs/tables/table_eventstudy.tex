@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\caption{Event Study: Conversion Rate Around Policy Revisions}
+\label{tab:eventstudy}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+$\tau$ & Up mean & Up SE & Up $N$ & Down mean & Down SE & Down $N$ & Diff ($p$) \\
+\midrule
+  -4 & -0.734 & 0.1595 & 15 & -0.632 & 0.1595 & 15 & -0.102 (0.658) \\
+  -3 & -0.732 & 0.1099 & 16 & -0.612 & 0.1099 & 16 & -0.120 (0.451) \\
+  -2 & -0.754 & 0.1182 & 17 & -0.732 & 0.1182 & 17 & -0.022 (0.896) \\
+  -1 & -0.534 & 0.1202 & 17 & -0.657 & 0.1202 & 17 & +0.123 (0.476) \\
+  0 & -0.613 & 0.1047 & 18 & -0.417 & 0.1047 & 18 & -0.196 (0.197) \\
+  1 & -0.567 & 0.1016 & 14 & -0.417 & 0.1016 & 14 & -0.150 (0.308) \\
+  2 & -0.453 & 0.1841 & 11 & -0.889 & 0.1841 & 11 & +0.436 (0.110) \\
+  3 & -0.444 & 0.1776 & 11 & -0.870 & 0.1776 & 11 & +0.427 (0.108) \\
+  4 & -0.632 & 0.1120 & 12 & -0.655 & 0.1120 & 12 & +0.022 (0.889) \\
+\bottomrule
+\multicolumn{8}{l}{\footnotesize Pre-trend Wald test $p=0.510$.}\\
+\multicolumn{8}{l}{\footnotesize Targeted DiD (post = $\tau \in \{2,3\}$): $\Delta\Delta = +0.458$, SE = 0.143, $p = 0.003$***.}\\
+\end{tabular}
+\end{table}
