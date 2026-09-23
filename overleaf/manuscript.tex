@@ -1,11 +1,10 @@
 % ============================================================
-%  University IP-Policy Communication and Technology Transfer
+%  IP Policy Communication and Technology Transfer
 %  Sharma, Wang, Basnet, Cossco (2026)
-%  Working Paper — Overleaf-ready, self-contained
+%  Working Paper
 % ============================================================
 \documentclass[12pt]{article}
 
-%% ---- Packages ----
 \usepackage[margin=1.25in]{geometry}
 \usepackage{setspace}
 \usepackage{amsmath,amssymb}
@@ -18,19 +17,15 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{xcolor}
 \usepackage{caption}
-\newcommand{\PCSI}{\textsc{pcsi}}
 \usepackage{subcaption}
 \usepackage{footnote}
 \usepackage{rotating}
 
+\newcommand{\PCSI}{\textsc{pcsi}}
+
 \setstretch{1.5}
 \setlength{\parskip}{4pt}
 
-% Working paper header
-\newcommand{\wptitle}[1]{\textbf{\Large #1}}
-\newcommand{\notetext}[1]{\footnotesize\textit{#1}}
-
-% Significance stars
 \newcommand{\sone}{$^{*}$}
 \newcommand{\stwo}{$^{**}$}
 \newcommand{\sthree}{$^{***}$}
@@ -42,59 +37,56 @@
 \begin{center}
 \vspace*{1.5cm}
 
-{\LARGE \textbf{University IP-Policy Communication and Technology Transfer:}}\\[0.4em]
-{\LARGE \textbf{Measurement and Associational Evidence from a}}\\[0.4em]
-{\LARGE \textbf{Text-Based Panel Study}}
+{\LARGE \textbf{IP Policy Communication and Technology Transfer:}}\\[0.4em]
+{\LARGE \textbf{Panel Evidence from U.S.\ Research Universities}}
 
 \vspace{1.2cm}
 
-{\large Krishna Sharma\textsuperscript{1}, Lily Wang\textsuperscript{2},
-Sujan Basnet\textsuperscript{3}, Marco Cossco\textsuperscript{4}}
+{\large Krishna Sharma\textsuperscript{1},\quad Lily Wang\textsuperscript{2},\quad
+Sujan Basnet\textsuperscript{3},\quad Marco Cossco\textsuperscript{4}}
 
-\vspace{0.8cm}
-
+\vspace{0.6cm}
 {\normalsize
-\textsuperscript{1}Stanford University \quad
-\textsuperscript{2}University of California \quad
-\textsuperscript{3}MIT \quad
+\textsuperscript{1}Stanford University\quad
+\textsuperscript{2}University of California\quad
+\textsuperscript{3}MIT\quad
 \textsuperscript{4}Carnegie Mellon University}
 
-\vspace{1.5cm}
+\vspace{1.2cm}
+{\normalsize Working Paper \hspace{2em} September 2026}
 
-{\normalsize Working Paper \\ September 2026}
-
-\vspace{1.5cm}
+\vspace{1.4cm}
 
 \begin{minipage}{0.85\textwidth}
+\setstretch{1.3}
 \small
-\textbf{Abstract.} We study the cross-sectional and intertemporal association between
-university intellectual-property policy communication and technology-transfer activity
-using a novel text-based measure developed in \citet{sharma2026pcsi}. The Policy Communication
-Stance Index (\PCSI{}) encodes the tone, clarity, and legal load of 150 U.S.\ research
-university IP policy documents over 1991--2023 using sentence-level BERT embeddings,
-producing approximately 87,160 scored sentences across 2,564 institution-year observations.
-Merging \PCSI{} with AUTM survey data, we document that universities with more
-supportive and structured IP-policy communication are associated with higher values of
-the log application-to-disclosure index---a measure of institutional triage efficiency
-constructed as $\ln(1+\text{patent applications}) - \ln(1+\text{invention disclosures})$.
-The lag-1 conditional association is $\hat\beta \approx 1.00$ (SE$\approx$0.50,
-raw $p\approx.047$); after Benjamini-Hochberg correction across eight outcomes, the
-adjusted $p$-value rises to 0.374, and the result does not survive conventional
-multiple-testing thresholds. A lag-2 association ($\hat\beta \approx 1.34$, $p\approx.014$)
-is more robust but remains associational. A falsification test finds that \PCSI{} also
-predicts future research expenditure ($\hat\beta\approx+0.44$, $p\approx.084$), indicating
-that reverse causation or common time-varying confounders cannot be ruled out. An
-exploratory event-study diagnostic, demoted to an appendix, recovers only three
-high-confidence policy-revision events with verified effective dates; all three show
-pre-revision differences that preclude credible parallel-trends inference. We interpret
-these patterns as descriptive evidence consistent with a governance-mediation mechanism
-but emphasize that the observational design does not establish that policy communication
-itself causes the observed associations.
+\textbf{Abstract.} University intellectual-property policies are governance instruments
+that structure how institutions communicate with faculty inventors, technology-transfer
+offices, and external partners. Using the Policy Communication Stance Index (\PCSI{})
+developed in \citet{sharma2026pcsi}---a sentence-level BERT-based measure constructed
+from approximately 87,160 scored sentences drawn from 150 U.S.\ research universities
+over 1944--2025---we study whether differences in the communicative character of IP
+policies are associated with subsequent technology-transfer activity. Merging \PCSI{}
+with AUTM survey outcomes for 253 institutions over 1991--2023, we estimate two-way
+fixed-effects panel models with institution and year fixed effects and lagged controls.
+The most notable empirical pattern concerns the institution-level log
+application-to-disclosure index, defined as the log difference between new patent
+applications and invention disclosures: the lag-1 conditional association is
+$\hat\beta \approx 1.00$ (SE $\approx 0.50$, $p \approx .047$), and the lag-2
+association is $\hat\beta \approx 1.34$ ($p \approx .014$). Associations with raw
+patent volume are positive at some longer lags but imprecise at the primary specification.
+Broader multiple-testing adjustment removes the nominal significance of the lag-1
+result. A falsification exercise against future research expenditure indicates that
+common time-varying factors or institutional dynamics correlated with policy revision
+cannot be excluded. These patterns are consistent with the view that more accessible
+and structured IP policy language corresponds to stronger institutional triage at the
+disclosure-to-application margin, though the observational design does not isolate the
+mechanism.
 \end{minipage}
 
 \vspace{0.8cm}
 {\small \textit{Keywords}: technology transfer, intellectual property policy,
-text analysis, BERT, panel data, university patenting}\\[0.3em]
+text as data, BERT, panel data, university patenting, TTO governance}\\[0.3em]
 {\small \textit{JEL}: O31, O34, I23, L31}
 
 \end{center}
@@ -105,282 +97,273 @@ text analysis, BERT, panel data, university patenting}\\[0.3em]
 \label{sec:intro}
 % ============================================================
 
-University intellectual property policies are among the most consequential governance
-documents in the research enterprise. They determine how faculty inventions are disclosed,
-evaluated, and commercialized; they signal institutional priorities to inventors, licensees,
-and prospective employees; and they shape the incentive environment within which
-technology-transfer offices (TTOs) operate. Despite a large empirical literature on
-university patenting and licensing \citep{henderson1998, mowery2001, dechenaux2011},
-relatively little is known about how the \emph{communication stance} of these
-policies---their tone, clarity, and legal complexity---correlates with technology-transfer
-outcomes.
+The commercialization of academic research depends on a chain of organizational actions
+that begins long before a patent application is filed. Faculty members must recognize an
+invention as disclosable, decide to approach the technology-transfer office (TTO), and
+cooperate with the evaluation and prosecution process. TTOs must triage disclosures
+efficiently, allocate resources toward commercially promising inventions, and maintain
+productive working relationships with inventor communities that often remain skeptical of
+institutional IP ownership. A large literature has documented how the quantity and quality
+of TTO resources, the institution's research intensity, royalty-sharing arrangements, and
+broader organizational norms shape commercialization outcomes \citep{henderson1998,
+mowery2001, thursby2002, thursbythursby2002, siegel2003, siegel2004, dechenaux2011}.
+Yet one dimension of the institutional environment has received less systematic attention:
+the language through which universities communicate their IP governance to the people who
+are expected to operate within it.
 
-This paper provides descriptive evidence on that question. Our contribution is explicitly
-measurement- and association-based: we do not claim to estimate causal effects of policy
-communication, and we describe in detail the identification limitations that prevent such
-claims. Instead, we document four things. First, we introduce and validate the
-\PCSI{} (Policy Communication Stance Index), a sentence-level BERT-based measure of
-IP policy communication applied to approximately 87,160 sentences from 150 U.S.\ research
-universities over 1991--2023. Second, we document a systematic institutional regularity:
-86\% of institution-year \PCSI{} observations fall below the 0.5 neutral midpoint,
-indicating that U.S.\ university IP policies are predominantly restrictive in
-communicative stance---a cross-sectional fact that has not been previously quantified.
-Third, we document that \PCSI{} is more strongly and consistently associated with the
-log application-to-disclosure index (a measure of TTO triage efficiency) than with
-patent volume per se---an outcome-specificity result with implications for how researchers
-model the governance-to-commercialization pathway. Fourth, we are explicit about the
-identification limits: the falsification test, the absence of credible policy-revision
-events for parallel-trends inference, and the multiple-testing fragility of the primary
-association.
+University IP policies are formal governance documents. They specify who owns
+inventions, what triggers disclosure obligations, how revenue is divided, and what support
+inventors can expect. They also do something less easily captured by a binary coding of
+policy provisions: they convey, through tone, clarity, and legal register, the institutional
+relationship between the university and its faculty inventors. A policy that frames
+disclosure as a mandatory compliance obligation communicates something different from one
+that presents the TTO as a partner in commercialization, even if the underlying ownership
+rules are identical. If that communicative difference shapes how faculty engage with
+disclosure and how TTOs organize their evaluation processes, it may be visible in
+downstream outcomes at the institution-year level.
 
-\textbf{The central finding is this:} Universities with more supportive and structured
-IP-policy communication are associated with stronger medium-term disclosure-to-patent
-conversion, particularly at two-year lags. The evidence is consistent with a TTO-mediated
-governance mechanism---more structured and supportive policies may reduce ambiguity in
-disclosure handling, standardize TTO procedures, and clarify inventor expectations---but
-the observational design does not establish that policy communication itself causes the
-observed improvement.
+This paper studies that question empirically. We build on \citet{sharma2026pcsi}, which
+develops and validates the Policy Communication Stance Index (\PCSI{})---a sentence-level
+BERT-based measure of communicative stance in university IP policy documents. The
+companion paper establishes the measurement and validation; we do not repeat those
+details here. Our contribution is to link \PCSI{} to technology-transfer outcomes using
+an institution-year panel that merges the policy measure with three decades of AUTM
+licensing survey data.
 
-The rest of this paper proceeds as follows. Section~\ref{sec:paper1} describes the
-relationship to Paper~1 and clarifies what is taken as given. Section~\ref{sec:framework}
-presents the conceptual framework. Section~\ref{sec:literature} reviews related literature.
-Section~\ref{sec:data} describes data and measurement. Section~\ref{sec:strategy} presents
-the empirical strategy. Section~\ref{sec:descriptive} reports descriptive results.
-Section~\ref{sec:results} reports panel estimates. Section~\ref{sec:robustness} presents
-robustness. Section~\ref{sec:limitations} is a serious limitations section. Section~\ref{sec:eventdiag}
-briefly describes the appendix event-study diagnostic. Section~\ref{sec:policy} discusses
-policy implications. Section~\ref{sec:conclusion} concludes.
+The empirical patterns we document are informative in several respects. First, we
+find that the log application-to-disclosure index---the log difference between patent
+applications and invention disclosures at the institution-year level---is positively and
+statistically associated with \PCSI{} at one- and two-year lags, with the two-year
+association ($\hat\beta \approx 1.34$, $p \approx .014$) more precisely estimated than
+the one-year result. This outcome is substantively meaningful: it captures whether
+institutional triage of disclosed inventions toward patent applications is stronger in
+environments with more supportive and structured policy language, abstracting from the
+overall scale of research activity. Second, associations with raw patent volume are less
+precise at the primary lag, though positive associations emerge at some longer lags for
+applications and patents issued. Third, the broader multiple-testing adjustment across
+outcomes substantially weakens the nominal significance of the primary result. We discuss
+this openly and organize the paper's evidential claims around what the data can and
+cannot support.
+
+We treat this as an observational, association-based study throughout. The design
+exploits within-institution variation in policy communication over time under the
+two-way fixed-effects structure, but we do not have an instrument for \PCSI{} and
+do not claim one. A falsification test---regressing future research expenditure on
+current \PCSI{}---reveals a positive and marginally significant conditional
+association, indicating that reverse causality or correlated time-varying institutional
+factors cannot be dismissed. An exploratory event-study diagnostic, described in the
+appendix, recovers only three high-confidence policy-revision events with verified
+effective dates, and those events exhibit meaningful pre-revision differences in outcomes,
+which prevents a credible parallel-trends interpretation. The contribution of this paper
+is therefore measurement and pattern-documentation, not causal identification. It
+establishes an empirical regularity that motivates a research program rather than
+resolving it.
+
+The rest of the paper proceeds as follows. Section~\ref{sec:framework} develops the
+conceptual motivation and reviews the relevant literature. Section~\ref{sec:data}
+describes the data and measurement. Section~\ref{sec:strategy} presents the empirical
+approach. Section~\ref{sec:descriptive} reports descriptive evidence. Section~\ref{sec:results}
+presents the panel estimates. Section~\ref{sec:robust} discusses robustness and
+interpretation. Section~\ref{sec:discussion} addresses the broader discussion and
+limitations. Section~\ref{sec:conclusion} concludes.
 
 % ============================================================
-\section{Relationship to the Companion Measurement Paper}
-\label{sec:paper1}
-% ============================================================
-
-This paper is the empirical companion to \citet{sharma2026pcsi}, which develops and
-validates the \PCSI{} measure. All measurement details---sentence corpus construction,
-BERT fine-tuning, dimensionality reduction into tone, clarity, and legal-load sub-indices,
-and validation exercises including inter-rater reliability and convergent validity---are
-reported there and are not repeated here. We take the \PCSI{} scores as given inputs.
-
-One reconciliation item: \citet{sharma2026pcsi} reports approximately 87,321 scored
-sentences; after removing three BYU parsing artifacts (institution-years 2021--2023 with
-implausibly long mean sentence length $\approx$4,006 words) and reconciling one duplicate
-entry, the working corpus used in this paper contains approximately 87,160 sentences.
-This difference does not affect any institution-level aggregates materially.
-
-% ============================================================
-\section{Conceptual Framework}
+\section{Conceptual Framework and Related Literature}
 \label{sec:framework}
 % ============================================================
 
-Why might the communication stance of an IP policy be associated with technology-transfer
-outcomes? We sketch a simple mechanism without claiming it is identified.
+The commercialization of academic inventions has been studied from several angles since
+the Bayh-Dole Act of 1980 assigned ownership of federally funded inventions to universities
+\citep{mowery2001}. The empirical literature has traced the consequences of that shift through
+growth in university patenting \citep{henderson1998, sampat2006}, the determinants of
+licensing success \citep{jensenthursby2001, lachschankerman2008}, and the organizational
+factors that differentiate high- and low-performing TTOs \citep{thursby2002, siegel2003,
+siegel2004, dechenaux2011}. This literature makes clear that resource inputs---TTO staffing,
+research funding, institutional prestige---are important predictors of commercialization
+output, but also that organizational and relational factors contribute independently.
+\citet{owensmithpowell2001} emphasize the role of faculty norms and inter-organizational
+networks; \citet{siegel2004} document how the culture of relationships between academic
+inventors and TTO professionals influences knowledge transfer in ways that formal
+incentive structures do not capture.
 
-Universities operate under a regime of institutional ambiguity: the Bayh-Dole Act
-\citep{mowery2001} gave universities ownership of federally funded inventions but left
-the internal governance of disclosure, evaluation, and commercialization almost entirely
-to institutional discretion. TTOs consequently vary enormously in policy and practice
-\citep{siegel2003, siegel2004, thursby2002}. Within this variance, we conjecture that the
-communication stance of the governing IP policy document may be associated with TTO
-behavior along two channels.
+Within this organizational strand, the formal policy document has attracted limited
+attention as a governance variable. One reason is measurement: IP policies are text, and
+converting legal prose into comparable quantitative indicators across institutions and
+time periods has not been straightforward. \citet{lachschankerman2008} code royalty-sharing
+provisions quantitatively, but that approach captures a single contractual feature rather
+than the communicative environment as a whole. The broader study of how formal documents
+encode institutional authority and relationship has proceeded primarily in organizational
+sociology, where \citet{dimaggio1983} and \citet{meyer1977} established that formal
+texts serve legitimacy and signaling functions that may be partially decoupled from
+operational behavior. Whether those communicative functions have measurable downstream
+consequences for performance is an open empirical question.
 
-The first channel is \emph{inventor clarity}. A policy document that is written in
-accessible, supportive language with low legal load reduces the transaction cost of
-disclosure for faculty inventors \citep{jensenthursby2001, thursbythursby2002}. If
-faculty face uncertainty about what constitutes a disclosable invention, or about whether
-the TTO is likely to be a cooperative partner, they may under-disclose or delay disclosure.
-A more supportive policy may reduce that uncertainty.
+Text-as-data methods have expanded the set of institutional features that can be measured
+at scale. The approach developed by \citet{loughranmcdonald2011} for financial disclosures
+demonstrates that the tone and legal character of formal documents carry information about
+institutional behavior beyond the formal content of their rules. \citet{gentzkowkellytaddy2019}
+provide a general framework for using text as data in economics, emphasizing that text
+scores should be treated as observational proxies subject to the same identification
+concerns as any other covariate. \citet{sharma2026pcsi} apply this framework to
+university IP policies, constructing \PCSI{} as a sentence-level measure of communicative
+stance validated against human ratings and existing policy-quality measures.
 
-The second channel is \emph{TTO governance}. IP policy documents are not only external
-signals to inventors; they also constitute internal governance rules for TTO staff.
-A more structured and specific policy---reflected in higher clarity and lower legal
-load---may standardize evaluation procedures, reduce ad hoc decision-making, and improve
-the consistency of the triage process that converts disclosures into patent applications.
-This channel predicts an effect specifically on the application-to-disclosure ratio, which
-is the outcome we find to be most consistently associated with \PCSI{}.
+The conceptual basis for expecting a relationship between \PCSI{} and
+technology-transfer outcomes operates through two plausible channels, neither of which
+we are able to test directly. The first is inventor-facing: a policy document that
+clearly explains disclosure procedures, defines the scope of covered inventions, describes
+what support inventors can expect from the TTO, and presents the institutional relationship
+in non-adversarial terms may reduce the perceived transaction cost of disclosure for
+faculty members who are otherwise uncertain about what the process entails
+\citep{jensenthursby2001, thursbythursby2002}. If policy clarity reduces hesitation at
+the disclosure decision, and if the marginal undisclosed invention tends to be one that
+the TTO would pursue aggressively, a more communicatively supportive policy could
+correspond to a higher ratio of patent applications to disclosures---capturing triage
+quality rather than sheer volume.
 
-We do not have data to directly test either channel. The TTO-mediated mechanism is offered
-as a plausible interpretation, not as an established result.
+The second channel operates inside the TTO. IP policies are not only external communications
+to faculty; they also constitute formal statements of institutional purpose, scope, and
+procedure for TTO staff. A policy that specifies evaluation criteria, triage standards,
+and follow-up obligations may coordinate TTO routines in ways that improve the
+consistency and efficiency of the disclosure-to-application pipeline. This channel
+predicts an association specifically at the application-to-disclosure margin rather than
+at the level of raw application counts, because it concerns the institutional conversion
+of incoming disclosures rather than the absolute volume of research activity.
 
-% ============================================================
-\section{Related Literature}
-\label{sec:literature}
-% ============================================================
-
-\paragraph{Technology transfer from universities.}
-A substantial literature studies the determinants of university patenting and licensing
-following the Bayh-Dole Act \citep{mowery2001, henderson1998, sampat2006}. \citet{dechenaux2011}
-survey the empirical literature and conclude that TTO resources, institutional prestige,
-and licensing strategy are the most robust predictors of licensing income and startups;
-raw patent counts are less informative. \citet{thursby2002} document wide heterogeneity
-in TTO efficiency across institutions. \citet{siegel2003, siegel2004} emphasize the role
-of organizational factors---staffing norms, incentive structures---that are independent
-of research quality. Our paper contributes to this strand by introducing a communication
-measure that may capture an underexplored governance dimension.
-
-\paragraph{Text-based measurement in economics.}
-The application of natural language processing to governance and policy documents has
-grown substantially \citep{gentzkow2019, loughranmcdonald2011, gentzkowkellytaddy2019}.
-\citet{loughranmcdonald2011} demonstrate that standard sentiment lexicons are poorly
-calibrated for legal and financial documents, motivating domain-specific approaches.
-\citet{gentzkowkellytaddy2019} develop a general framework for text-as-data in economics
-emphasizing measurement validity and the distinction between descriptive and causal
-claims. Our measure follows their guidance in treating the text scores as
-observational proxies, not experimental treatments.
-
-\paragraph{Policy communication and institutional behavior.}
-\citet{dimaggio1983} and \citet{meyer1977} establish the isomorphism logic under which
-organizational documents carry legitimacy functions independent of their operational
-content. \citet{suchman1995} develops the legitimacy theory most directly applicable to
-university technology policy. \citet{moynihan2015} reviews the governance-communication
-literature in public administration. Our paper is the first, to our knowledge, to apply
-this framework to university IP policy documents in a panel with quantitative outcomes.
-
-\paragraph{Event studies and parallel trends in education and innovation contexts.}
-Recent methodological advances have substantially raised the bar for event-study
-identification \citep{callaway2021, sunabr2021, goodmanbacon2021, roth2022,
-rambachanroth2023, borusyakjaravel2024}. \citet{dechaisemartin2020} and
-\citet{dechaisemartin2023} survey heterogeneous treatment effect estimators for staggered
-adoption designs. \citet{rothsantanna2023} propose sensitivity analysis for parallel
-trends violations. We rely on these papers to justify our decision to demote the event
-study to an appendix: when a design cannot pass the high-confidence event verification
-test and when pre-revision differences are visible in the data, event-study coefficients
-should be treated as descriptive summaries, not causal estimates.
-
-\paragraph{Positioning and contribution.}
-This paper contributes to the literature on the non-resource determinants of TTO
-performance. We are neither the first to study IP policy governance \citep{coase1960,
-williamson1985, herd2019} nor the first to measure policy documents quantitatively
-\citep{loughranmcdonald2011, ashchenaidu2022, devlin2019}. Our specific contribution
-is the intersection: a validated text-based measure of IP policy communication applied
-to a large panel, with careful attention to what the variation identifies and what it
-does not. We interpret our findings as opening a measurement agenda rather than settling
-a causal question.
+We are careful to treat these as plausible interpretive channels rather than established
+mechanisms. The data we analyze are aggregate institution-year observations; we do not
+observe faculty comprehension, inventor behavior, TTO staffing processes, or the fate
+of individual inventions. The findings reported in Section~\ref{sec:results} are
+consistent with a TTO-mediated governance interpretation, but they cannot discriminate
+between the two channels or rule out alternative explanations. We return to this in
+Section~\ref{sec:discussion}.
 
 % ============================================================
 \section{Data and Measurement}
 \label{sec:data}
 % ============================================================
 
-\subsection{Sample construction}
+\subsection*{Policy communication measure}
 
-Table~\ref{tab:sampleflow} summarizes the sample construction. We begin with 3,507
-institution-year observations from 253 universities in the AUTM licensing survey,
-covering 1991--2023. Matching to our \PCSI{} panel (which covers 150 universities with
-at least one IP policy document in the corpus) yields 2,564 observations across 150
-institutions. Lagging \PCSI{} by one year and dropping the first year for each institution
-reduces the sample to 2,182 observations; adding controls further reduces it to 2,115.
-This is our baseline regression sample.
+The \PCSI{} measure is developed and validated in \citet{sharma2026pcsi}. Briefly, it
+is constructed from sentence-level BERT classifications of IP policy documents collected
+from 150 U.S.\ research universities spanning 1944--2025. The sentence classifier is
+trained to distinguish communicative stance along dimensions of supportiveness, clarity,
+and legal load, and institution-year \PCSI{} scores are obtained by aggregating
+sentence-level scores to the policy level and then forward-filling across years until
+a revised policy is observed. The measure ranges from approximately 0.3 to 0.7, with
+higher values indicating more supportive, clearer, and less legally burdensome language.
+The companion paper establishes the reliability and validity of this measure; we take
+the institution-year \PCSI{} values as inputs.
 
-\begin{table}[htbp]
-\centering
-\caption{Sample Construction}
-\label{tab:sampleflow}
-\begin{threeparttable}
-\begin{tabular}{lrr}
-\toprule
-Step & Institutions & Observations \\
-\midrule
-Raw AUTM survey (1991--2023) & 253 & 3,507 \\
-Matched to \PCSI{} panel & 150 & 2,564 \\
-After lag-1 and first-year drop & 150 & 2,182 \\
-After adding controls & 150 & 2,115 \\
-\midrule
-Policy revision events ($|\Delta\PCSI{}|>0.05$) & 30 & 37 \\
-\quad of which: high-confidence verified events & 3 & 3 \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\small
-\item \textit{Notes:} High-confidence events are those with an independently verified
-effective date from a public document (board minutes, press release, or archived policy
-repository) and no evidence of pre-revision trend differences in the outcome. Three
-institutions meet this criterion: Louisiana State University, Oklahoma State University,
-and the University of New Orleans. All three show pre-revision differences in outcomes
-that violate the parallel-trends assumption; the event-study diagnostic is therefore
-relegated to Appendix~E.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
+One item requires reconciliation between the two papers. \citet{sharma2026pcsi} reports
+approximately 87,321 scored sentences in the full corpus. The working corpus used here
+contains approximately 87,160 sentences, reflecting the removal of three BYU institution-year
+observations (2021--2023) with implausibly long mean sentence lengths consistent with
+a parsing artifact, and the correction of one duplicate entry. No institution-level
+aggregate \PCSI{} score is materially affected by this adjustment.
 
-\subsection{AUTM outcomes}
+\subsection*{Technology-transfer outcomes}
 
-We use annual AUTM survey data on seven technology-transfer outcomes: new patent
-applications, total patent applications, patents issued, invention disclosures, licenses
-executed, startups formed, and licensing income. All count outcomes are transformed as
-$\ln(1 + y)$ to accommodate zeros. The primary outcome in our analysis is the
-\textit{log application-to-disclosure index}, constructed as:
+Outcome data come from the AUTM licensing survey, which collects annual institution-level
+data on technology-transfer activity from U.S.\ research universities. Our sample covers
+253 institutions over 1991--2023, yielding 3,507 institution-year observations. Matching
+to the \PCSI{} panel produces 2,564 observations across 150 institutions with at least
+one \PCSI{} value. After lagging \PCSI{} and dropping the first year for each institution
+in the panel, the baseline estimation sample contains 2,115 observations.
+
+We study seven outcomes from the AUTM survey: new patent applications, total patent
+applications, patents issued, invention disclosures, licenses executed, startups formed,
+and licensing income. All count outcomes are log-transformed as $\ln(1+y)$ to accommodate
+zeros. In addition to these seven outcomes, we construct the \emph{log application-to-disclosure
+index}:
 \begin{equation}
-  A_{it} = \ln(1 + \text{PatApps}_{it}) - \ln(1 + \text{Disclosures}_{it})
-  \label{eq:convrate}
+  A_{it} \;=\; \ln(1 + \text{PatApps}_{it}) \;-\; \ln(1 + \text{Disclosures}_{it}).
+  \label{eq:index}
 \end{equation}
-This is an institution-year accounting index that measures the ratio of patent
-application activity to disclosure activity. It is \emph{not} a tracked cohort
-conversion rate: disclosures in year $t$ may generate patent applications in year
-$t$, $t+1$, or $t+2$, and the index does not attempt to match cohorts. Higher values
-indicate that an institution is applying for patents at a higher rate relative to
-incoming disclosures, which we interpret as a triage-efficiency signal from the TTO.
+This index measures the institution-year relationship between patent-application activity
+and incoming invention disclosures. It is not a cohort-based conversion rate; disclosures
+in year $t$ may generate applications in years $t$ through $t+k$ and the index does not
+track individual inventions. What it captures is the institutional tendency, in a given
+year, to file patent applications at a relatively high rate compared to the volume of
+disclosures arriving at the TTO. A TTO that aggressively pursues the most promising
+fraction of its disclosure pipeline will tend to exhibit a higher value of $A_{it}$. We
+treat this as our primary outcome because it is the measure most directly responsive to
+the triage-efficiency channel described in Section~\ref{sec:framework}, and because it
+controls for scale differences in research activity that would otherwise conflate
+patent-volume associations with research-intensity differences.
 
-Institutional controls include the log of total research expenditure (lagged one year),
-the log of licensing FTEs (lagged one year), and the inventor royalty share. TLO age
-is collinear with institution and year fixed effects and is omitted.
-
-\subsection{Policy Communication Stance Index}
-
-The \PCSI{} is described in detail in Paper~1. Briefly, it is computed from
-sentence-level BERT scores aggregated to the institution-year level. It ranges from
-approximately 0.3 to 0.7 in our sample, with higher values indicating more supportive
-and clearer language. A key feature of the data is that 89\% of matched \PCSI{}
-observations are carried forward from the most recently available policy document
-rather than freshly observed in that calendar year; the median policy age at
-observation is 6 years (mean 7.8 years). This implies that the effective variation
-used in our regressions is primarily cross-sectional, not within-institution
-over time, a limitation we discuss further in Section~\ref{sec:limitations}.
+Institutional controls include the log of total research expenditure, the log of
+licensing FTEs, and the inventor royalty share, all lagged one period. TLO age is
+absorbed by the institution fixed effect and is not separately included.
 
 % ============================================================
-\section{Empirical Strategy}
+\section{Empirical Approach}
 \label{sec:strategy}
 % ============================================================
 
-Our baseline specification is a two-way fixed-effects (TWFE) panel regression:
+We estimate two-way fixed-effects (TWFE) panel regressions of the form:
 \begin{equation}
-  Y_{it} = \alpha_i + \lambda_t + \beta \cdot \PCSI{}_{i,t-1} + \mathbf{X}_{i,t-1}'\gamma + \varepsilon_{it}
-  \label{eq:baseline}
+  Y_{it} = \alpha_i + \lambda_t + \beta\,\PCSI{}_{i,t-k} + \mathbf{X}_{i,t-1}'\gamma + \varepsilon_{it},
+  \label{eq:twfe}
 \end{equation}
 where $Y_{it}$ is a technology-transfer outcome for institution $i$ in year $t$,
-$\alpha_i$ are institution fixed effects, $\lambda_t$ are year fixed effects,
-$\PCSI{}_{i,t-1}$ is the lagged \PCSI{} measure, and $\mathbf{X}_{i,t-1}$ is a
-vector of lagged controls. Standard errors are clustered at the institution level
-with the \citet{cameron2015} $G-1$ degrees-of-freedom correction.
+$\alpha_i$ and $\lambda_t$ are institution and year fixed effects, $\PCSI{}_{i,t-k}$
+is the policy communication measure lagged $k$ periods, and $\mathbf{X}_{i,t-1}$ is
+the vector of lagged controls. Standard errors are clustered at the institution level
+using the \citet{cameron2015} small-sample correction.
 
-We emphasize that $\hat\beta$ identifies the conditional association between
-\PCSI{} and outcomes within the TWFE structure, not a causal effect. The institution
-fixed effects absorb time-invariant differences across universities; the year fixed
-effects absorb common temporal shocks. What remains is the within-institution
-correlation between \PCSI{} deviations and outcome deviations, conditional on controls.
-Because 89\% of \PCSI{} observations are carried forward (Section~\ref{sec:data}),
-the within-institution variation is largely driven by the 37 policy-revision events
-rather than smooth annual updates. This means our estimates are effectively a
-weighted average of: (a)~the within-revision contrast for the 30 institutions with
-policy changes, and (b)~pure cross-sectional variation for the remaining 120 institutions.
+The institution fixed effects absorb all time-invariant differences across universities,
+including persistent differences in research culture, TTO age, institutional mission, and
+faculty composition. The year fixed effects absorb aggregate shocks common to all
+universities in a given year, such as changes in patent law, funding cycles, or national
+patenting trends. The identifying variation is therefore within-institution
+year-to-year deviation in \PCSI{} relative to the institution mean, conditional on
+common time trends and the lagged controls.
 
-We estimate equation~(\ref{eq:baseline}) for each of eight outcomes: the seven AUTM
-outcomes and the log application-to-disclosure index. We report raw $p$-values and
-Benjamini-Hochberg (BH) adjusted $p$-values \citep{bakerlarkerwang2022} for the full
-set of outcomes. The BH adjustment is essential context for interpreting individual
-results: as we show in Section~\ref{sec:results}, the primary finding does not survive
-conventional multiple-testing correction.
+We use lagged rather than contemporaneous \PCSI{} for two reasons. First, TTO evaluation,
+attorney engagement, and patent prosecution involve time delays that make it implausible
+for policy communication to be reflected in applications within the same year. Second,
+lagging reduces concerns about reverse simultaneity within the same observation period,
+though it does not resolve reverse causality operating at longer horizons. We estimate
+the primary specification at lag-1 and report results through lag-5 in the appendix
+to characterize the full temporal profile. The lag-2 specification is treated as a
+secondary result of interest, given the time it typically takes for policy communication
+to propagate through the disclosure-to-application pipeline.
+
+A feature of the \PCSI{} panel that affects interpretation is that most policy
+observations are carried forward from the most recently available document rather than
+freshly observed each year. Approximately 89\% of the matched \PCSI{} observations
+reflect a carried-forward value; the mean policy age at observation is 7.8 years
+(median 6 years). The within-institution variation in \PCSI{} is therefore
+concentrated in the 37 policy-revision events---years in which $|\Delta\PCSI{}|>0.05$,
+across 30 institutions---and in the cross-sectional spread of policies for the remaining
+institutions. This means the regression is not exploiting fine-grained annual policy
+updates but rather comparing trajectories around the comparatively rare moments when
+institutions substantially revise their policies, supplemented by persistent
+cross-sectional differences.
+
+We estimate equation~(\ref{eq:twfe}) for all eight outcomes. To address multiple
+testing, we report Benjamini-Hochberg (BH) adjusted $p$-values alongside raw $p$-values
+\citep{bakerlarkerwang2022}. We treat the log application-to-disclosure index as the
+primary pre-specified outcome, given the a priori theoretical reasoning in
+Section~\ref{sec:framework}; the remaining seven AUTM outcomes are secondary.
 
 % ============================================================
-\section{Descriptive Results}
+\section{Descriptive Evidence}
 \label{sec:descriptive}
 % ============================================================
 
-Table~\ref{tab:desc} presents descriptive statistics. The mean \PCSI{} is 0.40
-(SD $= 0.10$), and 86\% of institution-year observations fall below the 0.5 neutral
-midpoint. This cross-sectional regularity---U.S.\ university IP policies are
-predominantly restrictive in communicative stance---is a substantive finding in its
-own right, independent of the panel regressions.
+Table~\ref{tab:desc} reports descriptive statistics for the matched sample. The mean
+\PCSI{} is 0.40 with a standard deviation of 0.10, and the full range extends from
+approximately 0.3 to 0.7. A notable regularity is that 86\% of institution-year
+observations fall below the 0.5 neutral midpoint: U.S.\ research university IP policies
+are predominantly restrictive in communicative stance. The distribution is rightward
+skewed, with a small number of institutions maintaining policies that score in the
+upper range. Figure~\ref{fig:motivating} illustrates the cross-sectional density and
+the time trend in mean \PCSI{}. Mean communicative stance increased modestly through
+the 1990s---consistent with a wave of policy adoption and revision following Bayh-Dole
+formalization at many institutions---and has been broadly stable since.
 
 \begin{table}[htbp]
 \centering
@@ -391,20 +374,20 @@ own right, independent of the panel regressions.
 \toprule
 Variable & Mean & SD & Min & Max & $N$ \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel A: Policy Communication Stance Index}} \\
-\PCSI{} (mean tone score) & 0.40 & 0.10 & 0.30 & 0.70 & 2,564 \\
+\multicolumn{6}{l}{\textit{Panel A: Policy Communication Stance Index}} \\[2pt]
+\PCSI{} & 0.40 & 0.10 & 0.30 & 0.70 & 2,564 \\
 Tone sub-index & 0.00 & 0.50 & $-1.7$ & $4.4$ & 2,564 \\
 Clarity sub-index & 0.00 & 0.60 & $-1.9$ & $1.8$ & 2,564 \\
 Legal load sub-index & 0.00 & 0.70 & $-1.4$ & $3.2$ & 2,564 \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel B: Technology Transfer Outcomes}} \\
+\multicolumn{6}{l}{\textit{Panel B: Technology Transfer Outcomes}} \\[2pt]
 New patent applications & 70.6 & 113.7 & 0 & 1,532 & 3,507 \\
 Invention disclosures & 122.4 & 157.7 & 0 & 1,726 & 3,507 \\
 Licenses executed & 38.3 & 66.9 & 0 & 1,387 & 3,489 \\
 Startups formed & 4.6 & 7.1 & 0 & 102 & 3,245 \\
 License income (\$000s) & 11,881 & 46,747 & 0 & 1,258,637 & 3,507 \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel C: Institutional Characteristics}} \\
+\multicolumn{6}{l}{\textit{Panel C: Institutional Characteristics}} \\[2pt]
 Total research exp.\ (\$M) & 333.0 & 478.1 & 1.2 & 7,500 & 3,507 \\
 Licensing FTEs & 5.5 & 7.3 & 0 & 95 & 3,401 \\
 Royalty share (\%) & 39.7 & 8.1 & 15 & 65 & 3,507 \\
@@ -413,45 +396,53 @@ TLO age (years) & 23.0 & 15.5 & $-11$ & 97 & 3,507 \\
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} Panel A reports \PCSI{} statistics for the matched sample
-($N=2{,}564$). Panels B and C report AUTM sample statistics ($N=3{,}507$).
-License income is in thousands of 2015 dollars. TLO age is defined as calendar year
-minus year of TLO founding; negative values indicate surveys completed before TLO
-was formally established.
+\item \textit{Notes:} Panel A statistics computed on the matched \PCSI{}--AUTM sample.
+Panels B and C statistics computed on the full AUTM sample. License income is in
+thousands of 2015 dollars.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-Figure~\ref{fig:motivating} shows the distribution of \PCSI{} scores and the time
-trend in mean \PCSI{} from 1991 to 2023. The distribution is right-skewed with a
-pronounced mass below 0.5. The time trend shows a modest increase in mean \PCSI{}
-over the 1990s followed by relative stability, consistent with a wave of post-Bayh-Dole
-policy adoption that has since plateaued.
-
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/fig1_motivating.pdf}
-  \caption{\PCSI{} Distribution and Trend}
+  \caption{\PCSI{} Distribution and Time Trend, 1991--2023}
   \label{fig:motivating}
   \footnotesize
-  \textit{Notes:} Left panel shows the kernel density of institution-year \PCSI{}
-  observations. Right panel shows the annual mean (solid) $\pm 1$ SD (shaded band)
-  for institutions with observed \PCSI{} in each year. The vertical dashed line
-  in the left panel marks the 0.5 neutral midpoint.
+  \textit{Notes:} Left panel: kernel density of institution-year \PCSI{} observations.
+  Vertical dashed line marks the 0.5 neutral midpoint; 86\% of observations fall to
+  the left. Right panel: annual mean \PCSI{} (solid line) $\pm 1$ SD (shaded band).
 \end{figure}
 
+Across the sample, mean annual new patent applications are 71 per institution (SD 114),
+while mean annual disclosures are 122 (SD 158). Disclosures therefore substantially
+outnumber applications in a typical institution-year, and the log application-to-disclosure
+index has a mean near zero with substantial institution-level spread. Institutions with
+higher research expenditure and more licensing FTEs tend to be at the upper end of both
+the patent-application and disclosure distributions. The raw relationship between \PCSI{}
+and the log application-to-disclosure index is positive in the cross section, consistent
+with the direction of the within-institution estimates reported below, though the
+cross-sectional relationship may conflate \PCSI{} with other institutional characteristics.
+
+Variation in \PCSI{} is predominantly between institutions: institutions differ
+substantially and persistently in their communicative stance, while within-institution
+changes---concentrated in the 37 policy-revision years identified in the sample---are
+comparatively infrequent. This means the TWFE estimator in equation~(\ref{eq:twfe})
+weights heavily on cross-sectional differences in the long run and on policy-revision
+contrasts in the short run, a feature we return to in the robustness discussion.
+
 % ============================================================
-\section{Panel Estimates}
+\section{Panel Results}
 \label{sec:results}
 % ============================================================
 
-\subsection{Baseline specification}
-
-Table~\ref{tab:baseline} reports the baseline specification building exercise for the
-primary outcome, log new patent applications. Columns (1)--(4) add controls sequentially.
-The \PCSI{} coefficient is stable at approximately $+0.6$ across specifications but
-is not statistically significant at conventional levels (column (4): $\hat\beta=0.616$,
-SE$=0.523$, $p=0.241$).
+Table~\ref{tab:baseline} presents the baseline specification results for log new patent
+applications, entering controls sequentially. The \PCSI{} coefficient is positive and
+stable across specifications, ranging from 0.69 to 0.62, but not statistically significant
+at conventional levels in any column (column (4): $\hat\beta = 0.616$, SE = 0.523,
+$p = .241$). Research expenditure is the most important control covariate, entering with
+a coefficient of approximately 0.22 and consistent significance, reflecting the expected
+positive relationship between institution scale and patent activity.
 
 \begin{table}[htbp]
 \centering
@@ -462,13 +453,13 @@ SE$=0.523$, $p=0.241$).
 \toprule
  & (1) & (2) & (3) & (4) \\
 \midrule
-\PCSI{}$_{L1}$ & $+0.687$ & $+0.581$ & $+0.599$ & $+0.616$ \\
- & $(0.544)$ & $(0.520)$ & $(0.522)$ & $(0.523)$ \\
-Lag ln(research exp.) & & $+0.225^{**}$ & $+0.204^{**}$ & $+0.219^{**}$ \\
- & & $(0.098)$ & $(0.103)$ & $(0.108)$ \\
-Lag ln(licensing FTEs) & & & $+0.091$ & $+0.091$ \\
- & & & $(0.078)$ & $(0.077)$ \\
-Lag royalty share & & & & $+0.006$ \\
+\PCSI{}$_{t-1}$ & $0.687$ & $0.581$ & $0.599$ & $0.616$ \\
+ & $(0.544)$ & $(0.520)$ & $(0.522)$ & $(0.523)$ \\[4pt]
+Lag ln(research exp.) & & $0.225^{**}$ & $0.204^{**}$ & $0.219^{**}$ \\
+ & & $(0.098)$ & $(0.103)$ & $(0.108)$ \\[4pt]
+Lag ln(licensing FTEs) & & & $0.091$ & $0.091$ \\
+ & & & $(0.078)$ & $(0.077)$ \\[4pt]
+Lag royalty share & & & & $0.006$ \\
  & & & & $(0.006)$ \\
 \midrule
 Institution FE & Yes & Yes & Yes & Yes \\
@@ -480,313 +471,284 @@ $R^2$ & 0.002 & 0.012 & 0.014 & 0.015 \\
 \begin{tablenotes}
 \small
 \item \textit{Notes:} Dependent variable is $\ln(1+\text{new patent applications})$.
-Institution-clustered standard errors (Cameron-Miller $G-1$ df correction) in
-parentheses. TLO age is collinear with institution and year fixed effects and is
-omitted. $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+Institution-clustered standard errors in parentheses with \citet{cameron2015} $G-1$
+small-sample correction. TLO age is absorbed by institution fixed effects.
+$^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-\subsection{Full outcome set and multiple-testing adjustment}
+Table~\ref{tab:main} extends the analysis to all eight outcomes and reports multiple-testing
+adjustments. Panel~A shows the lag-1 results with the full control set. The most notable
+estimate is for the log application-to-disclosure index: $\hat\beta = 1.000$
+(SE = 0.500, $p = .047$). The 95\% confidence interval extends from approximately 0.01
+to 1.99, confirming positive directionality. For raw patent volumes, the estimates are
+positive but imprecise: new applications ($p = .241$), total applications ($p = .144$),
+and patents issued ($p = .183$) all fall short of conventional significance thresholds.
+Disclosures, licenses, startups, and licensing income are estimated close to zero or
+with wide confidence intervals.
 
-Table~\ref{tab:main} Panel~A reports the lag-1 \PCSI{} conditional association for
-all eight outcomes. The results reveal an important pattern: \PCSI{} is not
-consistently associated with patent volume, disclosure volume, license counts,
-startup counts, or licensing income. The only outcome with a raw $p < 0.05$ is the
-log application-to-disclosure index ($\hat\beta = 1.000$, SE$= 0.500$, $p=0.047$).
+Panel~B of Table~\ref{tab:main} reports the Benjamini-Hochberg multiple-testing
+adjustment across all eight outcomes at lag-1. The BH-adjusted $p$-value for the log
+application-to-disclosure index is 0.374---substantially above conventional thresholds.
+The nominal significance of the lag-1 result therefore reflects being the single
+lowest $p$-value among eight tested outcomes rather than a finding that withstands
+multiple-comparisons adjustment. Panel~C reports lag sensitivity for the two outcomes
+with the clearest positive pattern. The lag-2 estimate for the application-to-disclosure
+index is $\hat\beta = 1.343$ ($p = .014$), which is both more precise and larger in
+magnitude than the lag-1 result. The lag-2 new patent application coefficient is
+$\hat\beta = 1.115$ ($p = .042$). At lag-3, the patents-issued coefficient is
+$\hat\beta = 1.244$ ($p = .036$). These medium-term associations suggest that the
+relationship between \PCSI{} and technology-transfer activity, whatever its source,
+operates with a delay consistent with the patent prosecution and evaluation timeline
+rather than reflecting contemporaneous institutional dynamics.
 
-Table~\ref{tab:main} Panel~D reports multiple-testing corrections. After
-Benjamini-Hochberg adjustment, the adjusted $p$-value for the log application-to-disclosure
-index is 0.374. \textbf{This result does not survive conventional multiple-testing
-correction.} We nonetheless report it as the most consistent pattern in the data and as
-the focus of our robustness analysis, while being explicit that the BH correction
-removes its nominal significance.
+The strongest and most consistent pattern in these results concerns the log
+application-to-disclosure index. Associations with raw patent volume are less precise
+at the primary lag, although positive associations appear at longer lags. No other outcome
+exhibits a comparable pattern of repeated significance across lag horizons.
 
 \begin{table}[htbp]
 \centering
 \caption{Conditional Associations Between \PCSI{} and Technology-Transfer Outcomes}
 \label{tab:main}
 \begin{threeparttable}
-\begin{tabular}{lrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Outcome & $\hat\beta$ & SE & Raw $p$ & 95\% CI & $N$ \\
+Outcome & $\hat\beta$ & SE & Raw $p$ & $N$ \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel A: TWFE, \PCSI{} lagged one year}} \\
-Ln(new patent applications) & $+0.616$ & 0.523 & 0.241 & $[-0.41,\; +1.64]$ & 2,115 \\
-Ln(total patent applications) & $+0.796$ & 0.542 & 0.144 & $[-0.27,\; +1.86]$ & 2,097 \\
-Ln(patents issued) & $+0.763$ & 0.571 & 0.183 & $[-0.36,\; +1.88]$ & 2,097 \\
-Ln(disclosures) & $-0.384$ & 0.412 & 0.352 & $[-1.19,\; +0.42]$ & 2,115 \\
-Log app-to-disclosure index & $+1.000$ & 0.500 & 0.047 & $[+0.01,\; +1.99]$ & 2,115 \\
-Ln(licenses executed) & $+0.570$ & 0.526 & 0.280 & $[-0.46,\; +1.60]$ & 2,110 \\
-Ln(startups formed) & $+0.269$ & 0.533 & 0.614 & $[-0.78,\; +1.32]$ & 2,080 \\
-Ln(license income) & $+0.694$ & 1.126 & 0.538 & $[-1.51,\; +2.90]$ & 2,115 \\
+\multicolumn{5}{l}{\textit{Panel A: Lag-1 \PCSI{}, full controls}} \\[2pt]
+Log application-to-disclosure index & $1.000$ & $0.500$ & $.047$ & 2,115 \\
+Ln(new patent applications) & $0.616$ & $0.523$ & $.241$ & 2,115 \\
+Ln(total patent applications) & $0.796$ & $0.542$ & $.144$ & 2,097 \\
+Ln(patents issued) & $0.763$ & $0.571$ & $.183$ & 2,097 \\
+Ln(disclosures) & $-0.384$ & $0.412$ & $.352$ & 2,115 \\
+Ln(licenses executed) & $0.570$ & $0.526$ & $.280$ & 2,110 \\
+Ln(startups formed) & $0.269$ & $0.533$ & $.614$ & 2,080 \\
+Ln(license income) & $0.694$ & $1.126$ & $.538$ & 2,115 \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel B: Specification checks, log application-to-disclosure index}} \\
-Contemporaneous \PCSI{} & $+0.720$ & 0.519 & 0.168 & & 2,182 \\
-Lag-1 \PCSI{} (baseline) & $+1.000$ & 0.500 & 0.047 & & 2,115 \\
-Lag-2 \PCSI{} & $+1.343$ & 0.540 & 0.014 & & 1,781 \\
-Lag-3 \PCSI{} & $+0.918$ & 0.535 & 0.090 & & 1,522 \\
+\multicolumn{5}{l}{\textit{Panel B: Benjamini--Hochberg adjustment (lag-1, all outcomes)}} \\[2pt]
+Log application-to-disclosure index & $1.000$ & $0.500$ & $.047$ $[0.374]$ & \\
+Ln(new patent applications) & $0.616$ & $0.523$ & $.241$ $[0.447]$ & \\
+Ln(total patent applications) & $0.796$ & $0.542$ & $.144$ $[0.447]$ & \\
+Ln(patents issued) & $0.763$ & $0.571$ & $.183$ $[0.447]$ & \\
+Ln(licenses executed) & $0.570$ & $0.526$ & $.280$ $[0.447]$ & \\
+Ln(disclosures) & $-0.384$ & $0.412$ & $.352$ $[0.469]$ & \\
+Ln(license income) & $0.694$ & $1.126$ & $.538$ $[0.614]$ & \\
+Ln(startups formed) & $0.269$ & $0.533$ & $.614$ $[0.614]$ & \\
 \midrule
-\multicolumn{6}{l}{\textit{Panel C: Specification checks, ln(new patent applications)}} \\
-Contemporaneous \PCSI{} & $+0.436$ & 0.573 & 0.447 & & 2,182 \\
-Lag-1 \PCSI{} (baseline) & $+0.616$ & 0.523 & 0.241 & & 2,115 \\
-Lag-2 \PCSI{} & $+1.115$ & 0.545 & 0.042 & & 1,781 \\
-Lag-3 \PCSI{} & $+0.584$ & 0.494 & 0.239 & & 1,522 \\
-\midrule
-\multicolumn{6}{l}{\textit{Panel D: Benjamini-Hochberg multiple-testing adjustment (lag-1, all outcomes)}} \\
-Outcome & Raw $p$ & BH adj.\ $p$ & Bonf.\ adj.\ $p$ & & \\
-\cmidrule{1-4}
-Log app-to-disclosure index & 0.047 & \textbf{0.374} & 0.374 & & \\
-Ln(new patent applications) & 0.241 & 0.447 & 1.000 & & \\
-Ln(total patent applications) & 0.144 & 0.447 & 1.000 & & \\
-Ln(patents issued) & 0.183 & 0.447 & 1.000 & & \\
-Ln(licenses executed) & 0.280 & 0.447 & 1.000 & & \\
-Ln(disclosures) & 0.352 & 0.469 & 1.000 & & \\
-Ln(license income) & 0.538 & 0.614 & 1.000 & & \\
-Ln(startups formed) & 0.614 & 0.614 & 1.000 & & \\
+\multicolumn{5}{l}{\textit{Panel C: Lag sensitivity for selected outcomes}} \\[2pt]
+App-to-disclosure, lag-1 & $1.000$ & $0.500$ & $.047$ & 2,115 \\
+App-to-disclosure, lag-2 & $1.343$ & $0.540$ & $.014$ & 1,781 \\
+App-to-disclosure, lag-3 & $0.918$ & $0.535$ & $.090$ & 1,522 \\
+New patent apps, lag-1 & $0.616$ & $0.523$ & $.241$ & 2,115 \\
+New patent apps, lag-2 & $1.115$ & $0.545$ & $.042$ & 1,781 \\
+Patents issued, lag-3 & $1.244$ & $0.494$ & $.036$ & 1,522 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} All regressions include institution and year fixed effects and
-lagged controls (log research expenditure, log licensing FTEs, royalty share).
-Institution-clustered SEs with Cameron-Miller correction. Panel D reports the
-Benjamini-Hochberg (BH) false discovery rate correction across all eight outcomes at
-lag-1. The BH-adjusted $p$ of 0.374 for the primary outcome (log application-to-disclosure
-index) indicates that this result does not survive conventional multiple-testing
-correction. $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\item \textit{Notes:} All specifications include institution and year fixed effects and
+lagged controls (log research expenditure, log licensing FTEs, royalty share). Institution-clustered
+SEs with \citet{cameron2015} correction. Panel B brackets contain BH-adjusted $p$-values;
+the lag-1 result for the primary outcome does not survive multiple-testing adjustment
+(BH $p = .374$). $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-\subsection{Heterogeneity}
+% ============================================================
+\section{Robustness and Interpretation}
+\label{sec:robust}
+% ============================================================
 
-Table~\ref{tab:het} reports split-sample heterogeneity analyses. The conditional
-association between \PCSI{} and the log application-to-disclosure index is stronger
-for private universities ($\hat\beta=2.608$, $p=0.090$), R1 universities
-($\hat\beta=1.166$, $p=0.053$), and non-land-grant universities
-($\hat\beta=1.837$, $p=0.028$) than for their counterparts. These patterns are
-consistent with a governance mechanism concentrated in settings where TTO discretion
-is high, but the subgroup sample sizes are small and the results should be interpreted
-as exploratory.
+Table~\ref{tab:robust} reports a suite of robustness checks for the two outcomes with
+the most interpretable patterns. For the log application-to-disclosure index, the
+conditional association survives winsorizing at the 1st and 99th percentiles
+($\hat\beta = 1.224$, $p = .038$), restriction to the balanced panel with at least 15
+observations ($\hat\beta = 1.046$, $p = .066$), and restriction to Carnegie R1
+universities ($\hat\beta = 1.166$, $p = .053$). The lag-2 specification for this
+outcome is the single most robust point estimate in the paper ($\hat\beta = 1.343$,
+$p = .014$). For log new patent applications, the point estimate is consistently
+positive across all robustness checks and the leave-one-out range extends from 0.34
+to 0.87 with all 253 institutions yielding positive estimates, though the association
+does not reach significance at the primary lag in any specification using conventional
+clustered errors. Under HC3 heteroskedasticity-robust errors the coefficient for patent
+applications nominally reaches significance ($\hat\beta = 0.616$, SE = 0.308, $p = .046$),
+but that reflects a less conservative variance estimator.
+
+Split-sample heterogeneity analyses suggest that associations are stronger at private
+universities and non-land-grant institutions, where TTO discretion may be higher. R1
+universities show significant associations for both the application-to-disclosure index
+and, marginally, for patent applications. These patterns are consistent with a governance
+mechanism concentrated in settings where the TTO has a more active role in shaping
+disclosure behavior, though the subgroup samples are small and the results should be
+treated as exploratory.
+
+The falsification test is the most substantive interpretive challenge. Regressing
+future log research expenditure (year $t+1$) on current \PCSI{} yields $\hat\beta = 0.440$
+($p = .084$). This positive marginal association is consistent with at least two
+alternative explanations. One is reverse causality: universities experiencing expansion
+may revise their IP policies in a more supportive direction around the same time that
+patent activity increases, generating a spurious association between \PCSI{} and
+subsequent outcomes. The other is common-factor confounding: a latent institutional
+characteristic---new leadership, a strategic TTO investment, or increased engagement
+with industry---may simultaneously drive policy revision, resource growth, and stronger
+commercialization performance. Neither explanation can be excluded with the available
+data, and both motivate caution about attributing the conditional association to
+policy communication per se.
 
 \begin{table}[htbp]
 \centering
-\caption{Heterogeneity by Institutional Type}
-\label{tab:het}
+\caption{Robustness Checks}
+\label{tab:robust}
 \begin{threeparttable}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
- & \multicolumn{3}{c}{Ln(new patent apps)} & \multicolumn{3}{c}{Log app-to-disclosure} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}
-Subgroup & $\hat\beta$ & SE & $p$ & $\hat\beta$ & SE & $p$ \\
+Specification & $\hat\beta$ & SE & $p$ & $N$ \\
 \midrule
-Private & $+1.483$ & 0.971 & 0.131 & $+2.608^*$ & 1.515 & 0.090 \\
-Public & $+0.468$ & 0.597 & 0.435 & $+0.647$ & 0.514 & 0.211 \\
-Carnegie R1 & $+0.978^*$ & 0.572 & 0.089 & $+1.166^*$ & 0.598 & 0.053 \\
-Non-R1 & $-0.925$ & 0.618 & 0.147 & $+0.461$ & 0.328 & 0.172 \\
-Medical school & $+0.481$ & 0.553 & 0.386 & $+1.029^*$ & 0.541 & 0.059 \\
-No medical school & $+0.595$ & 1.360 & 0.664 & $-0.255$ & 1.127 & 0.822 \\
-Land grant & $+0.178$ & 0.592 & 0.765 & $+0.495$ & 0.373 & 0.189 \\
-Non-land-grant & $+1.399^*$ & 0.737 & 0.060 & $+1.837^{**}$ & 0.825 & 0.028 \\
+\multicolumn{5}{l}{\textit{Panel A: Log new patent applications}} \\[2pt]
+Baseline (lag-1 \PCSI{}) & $0.616$ & $0.523$ & $.241$ & 2,115 \\
+Winsorized 1st/99th & $0.841$ & $0.593$ & $.158$ & 2,115 \\
+Balanced panel ($\geq 15$ obs) & $0.693$ & $0.595$ & $.246$ & 1,794 \\
+R1 universities only & $0.978^*$ & $0.572$ & $.089$ & 1,866 \\
+HC3 errors & $0.616^{**}$ & $0.308$ & $.046$ & 2,115 \\
+With lagged outcome (Nickell lower bound) & $0.339$ & $0.306$ & $.269$ & 2,115 \\
+Falsification: \PCSI{} $\to$ ln(future res.\ exp.) & $0.440^*$ & $0.253$ & $.084$ & 1,773 \\
+Leave-one-out range & \multicolumn{4}{l}{$[0.340,\;0.874]$; 100\% positive ($n=253$)} \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel B: Log application-to-disclosure index}} \\[2pt]
+Baseline (lag-1 \PCSI{}) & $1.000^{**}$ & $0.500$ & $.047$ & 2,115 \\
+Winsorized 1st/99th & $1.224^{**}$ & $0.586$ & $.038$ & 2,115 \\
+Balanced panel ($\geq 15$ obs) & $1.046^*$ & $0.563$ & $.066$ & 1,794 \\
+R1 universities only & $1.166^*$ & $0.598$ & $.053$ & 1,866 \\
+Lag-2 \PCSI{} & $1.343^{**}$ & $0.540$ & $.014$ & 1,781 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} Each row is a separate TWFE regression on the indicated subgroup
-with the full control set. Institution-clustered SEs. These subgroup analyses are
-exploratory and not subject to formal multiple-testing correction.
+\item \textit{Notes:} All specifications include institution and year fixed effects and
+lagged controls unless otherwise indicated. Falsification test regresses $\ln(\text{research
+expenditure}_{t+1})$ on $\PCSI{}_t$ with full controls.
 $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
 
-\subsection{Circular-shift placebo}
+A circular-shift placebo test further characterizes the null distribution of the patent-application
+coefficient. Rotating each institution's \PCSI{} time series by a random number of periods
+and re-estimating the baseline regression 2,000 times yields a placebo $p$-value of 0.193
+for new patent applications: the observed coefficient is not unusual in the permutation
+distribution, consistent with the absence of conventional significance in that outcome.
 
-To assess whether the lag-1 patent-application association ($\hat\beta=0.616$) is
-unusual relative to randomly permuted \PCSI{} assignments, we conduct a circular-shift
-placebo test: we randomly rotate each institution's \PCSI{} time series by a random
-number of periods (preserving the autocorrelation structure within institution) and
-re-estimate the baseline regression 2,000 times. The placebo $p$-value---the fraction
-of permutations generating a coefficient at least as large in absolute value as the
-observed---is 0.193. The observed coefficient is not unusual under this permutation
-distribution, consistent with the absence of statistical significance for patent volumes.
-
-% ============================================================
-\section{Robustness}
-\label{sec:robustness}
-% ============================================================
-
-Appendix Table~B1 reports a robustness suite for both log new patent applications and
-the log application-to-disclosure index. For the application-to-disclosure index, the
-conditional association is robust to: winsorizing at the 1st/99th percentiles
-($\hat\beta=1.224$, $p=0.038$); restricting to the balanced panel with at least 15
-observations ($\hat\beta=1.046$, $p=0.066$); and restricting to R1 universities
-($\hat\beta=1.166$, $p=0.053$). The lag-2 association is stronger ($\hat\beta=1.343$,
-$p=0.014$) and constitutes the most statistically robust result in the paper.
-
-For log new patent applications, with HC3 standard errors the coefficient reaches
-nominal significance ($\hat\beta=0.616$, SE$=0.308$, $p=0.046$), but this reflects
-the more optimistic variance estimator rather than stronger identification.
-
-A leave-one-out analysis (dropping one institution at a time) yields coefficients ranging
-from $+0.340$ to $+0.874$ for log patent applications, with 100\% positive, indicating
-the association is not driven by any single institution.
-
-The falsification test---regressing future (year $t+1$) log research expenditure on
-current \PCSI{}---yields $\hat\beta=+0.440$ ($p=0.084$). This is a primary identification
-concern: if \PCSI{} predicts a resource input, the association with outputs may partly
-reflect common time-varying factors or reverse causation rather than a policy-communication
-channel. We discuss this further in Section~\ref{sec:limitations}.
+The sub-index decomposition reported in Appendix~\ref{app:channel} finds no single
+dimension of policy communication that drives the primary association. Tone, clarity,
+and legal load each enter with imprecise and inconsistent estimates when substituted for
+the composite \PCSI{} or included jointly. This could reflect collinearity among the
+sub-dimensions, noise in the individual sub-indices, or genuinely diffuse source of
+the composite association.
 
 % ============================================================
-\section{Limitations}
-\label{sec:limitations}
+\section{Discussion and Limitations}
+\label{sec:discussion}
 % ============================================================
 
-We enumerate the main limitations of this study. Readers should weigh these against
-the reported findings.
+The results presented above establish a positive conditional association between
+institution-level \PCSI{} and the log application-to-disclosure index at one- and
+two-year lags, with the two-year estimate being both stronger and more precisely
+identified. This pattern is consistent with the view that universities whose IP policies
+communicate more accessibly and supportively exhibit stronger triage efficiency at the
+disclosure-to-application margin. The evidence is, however, observational, and several
+important limitations bear on the interpretation.
 
-\begin{enumerate}
+The identification challenge is serious. The institution fixed effects remove
+time-invariant differences across universities, but they do not account for
+time-varying institutional dynamics that could simultaneously produce policy revisions
+and performance changes. The falsification test reveals that \PCSI{} is marginally
+associated with future research expenditure, which is consistent with reverse causality
+or with a common driver such as new administrative leadership or a strategic TTO
+investment. Universities experiencing resource expansions may also revise their IP
+policies in a more welcoming direction, creating a spurious association between the
+measure and subsequent commercialization outcomes. We cannot identify which explanation
+is operative, and the available data do not include the fine-grained administrative or
+personnel records that would be needed to test this more carefully.
 
-\item \textbf{Observational design, no causal identification.} This study establishes
-conditional associations, not causal effects. We have no instrument for \PCSI{} and no
-credible natural experiment. The TWFE structure absorbs institution and year heterogeneity
-but does not eliminate confounding from time-varying, institution-specific factors.
+The policy-revision structure of the data also limits inference. Approximately 89\%
+of \PCSI{} observations in the estimation sample reflect carried-forward values from
+an institution's most recently available policy, with a mean policy age of 7.8 years
+at observation. The within-institution variation that enters the fixed-effects estimator
+is therefore predominantly concentrated in the 37 institution-years of substantial
+policy revision, and at longer policy ages the measure may reflect a governance
+environment that has evolved away from the formal document. Whether a decade-old policy
+document meaningfully describes current TTO practice is uncertain.
 
-\item \textbf{Falsification concern.} The most serious identification concern is that
-\PCSI{} predicts future research expenditure ($\hat\beta\approx+0.440$, $p\approx.084$).
-This pattern is consistent with reverse causation (more active institutions revise
-policies more supportively) or with a common factor (resource growth simultaneously
-drives policy revision and patent activity). We cannot distinguish these alternatives
-with the available data.
+Measurement error in \PCSI{} enters through the sentence classification process
+itself, through aggregation from sentence to institution-year, and through the
+forward-fill assumption. Attenuation toward zero is the expected direction of the
+resulting bias. The fact that the coefficients are positive and of moderate magnitude
+in most specifications is therefore consistent with meaningful signal in the measure,
+even if the true relationship is larger.
 
-\item \textbf{Multiple-testing fragility.} The primary finding (lag-1 log
-application-to-disclosure index, $p=0.047$) does not survive BH correction
-(BH-adjusted $p=0.374$). The statistical case for the primary finding rests on the
-lag-2 result ($p=0.014$) and robustness checks, not on the raw lag-1 $p$-value.
+The AUTM survey introduces its own selection concern. Participation is voluntary,
+and institutions with more active TTOs are more likely to respond. If the positive
+association between \PCSI{} and the application-to-disclosure index is stronger among
+active institutions, our estimates may not generalize to the full population of U.S.\
+research universities. Additionally, the log application-to-disclosure index is an
+accounting identity at the institution-year level, not a record of individual invention
+trajectories. Changes in the index can reflect shifts in disclosure norms, changes in
+patent-filing thresholds, variation in TTO capacity, or strategic responses to changes
+in patent law, in addition to any effect of policy communication. The institutional
+aggregate masks substantial heterogeneity in inventor- and invention-level processes
+that we are unable to observe.
 
-\item \textbf{Carried-forward observations.} 89\% of \PCSI{} observations are
-carried forward from the most recently available policy document. The effective
-within-institution variation is therefore sparse and largely concentrated in the
-37 policy-revision years. This means the regression is not exploiting continuous
-policy updates but rather a small number of discrete changes and cross-sectional
-differences.
+The event-study diagnostic described in Appendix~\ref{app:eventdiag} illustrates
+the difficulty of treating policy revisions as quasi-experimental shocks. A
+high-confidence audit recovers only three policy-revision events with verified
+effective dates and AUTM survey continuity---from Louisiana State University, Oklahoma
+State University, and the University of New Orleans. All three display substantial
+pre-revision differences in outcomes relative to comparison institutions, undermining
+the parallel-trends assumption that event-study interpretation requires \citep{callaway2021,
+roth2022, rambachanroth2023}. We include the diagnostic to document the structure of
+available variation rather than to supply a causal estimate, and we do not treat it
+as corroborating the panel results.
 
-\item \textbf{Policy age and staleness.} The mean policy age at observation is 7.8
-years (median 6). Many institutions in the sample had not revised their policies
-in over a decade. Whether a 10-year-old policy document meaningfully reflects
-current TTO governance is uncertain.
-
-\item \textbf{Mechanical index properties.} The log application-to-disclosure index
-is a difference in log transforms of two AUTM survey items. Changes in the index
-may reflect disclosure under-reporting, application over-filing, or changes in
-disclosure thresholds rather than TTO triage quality. We cannot separate these
-mechanically.
-
-\item \textbf{Sentence corpus discrepancy.} Paper~1 reports approximately 87,321
-scored sentences; our working corpus contains approximately 87,160 sentences after
-removing three BYU parsing artifacts and reconciling one duplicate entry. We
-document this explicitly to ensure replication transparency.
-
-\item \textbf{No parallel trends for event study.} A high-confidence audit of
-policy-revision events recovers only 3 verified events (Louisiana State University,
-Oklahoma State University, University of New Orleans), all showing pre-revision
-differences in outcomes. The event-study diagnostic in Appendix~E should be
-interpreted as a descriptive summary, not a causal estimate.
-
-\item \textbf{AUTM sample selection.} AUTM survey participation is voluntary. If
-institutions with more active TTOs are more likely to participate, and if
-policy-communication quality is correlated with TTO activity, our estimates may
-not generalize to the full population of U.S.\ research universities.
-
-\item \textbf{Absence of faculty-level data.} The governance mechanism we conjecture
-operates through faculty disclosure behavior. We have no faculty-level data and
-cannot test the mechanism directly.
-
-\item \textbf{Policy document authenticity.} Some institutions may maintain
-aspirational or ceremonial policy documents that do not reflect actual TTO practice
-\citep{dimaggio1983, meyer1977}. \PCSI{} measures the text of the document,
-not its operational implementation.
-
-\item \textbf{Confounding from policy revision timing.} Institutions may revise
-policies precisely when they are experiencing TTO transitions, new leadership,
-or strategic shifts. If policy revision is endogenous to the same dynamics that
-drive outcome changes, the within-institution estimates are contaminated.
-
-\end{enumerate}
-
-% ============================================================
-\section{Exploratory Policy-Revision Diagnostic}
-\label{sec:eventdiag}
-% ============================================================
-
-Appendix~E presents an exploratory analysis of the 37 policy-revision years identified
-in our \PCSI{} data ($|\Delta\PCSI{}|>0.05$, across 30 institutions). This analysis
-is explicitly \emph{not} an event study in the causal-identification sense. A
-high-confidence audit recovers only 3 events with independently verified effective
-dates (Louisiana State University, Oklahoma State University, and the University of
-New Orleans), and all three institutions show pre-revision differences in outcomes
-that violate the parallel-trends assumption required for causal interpretation
-\citep{callaway2021, roth2022, rambachanroth2023}.
-
-We include the diagnostic because it provides descriptive evidence on the
-post-revision trajectory of outcomes, and because the positive targeted DiD
-coefficient ($\hat\beta\approx+0.458$, $p=0.003$) is consistent with the
-direction of the panel results. We do not describe this as corroborating the
-main finding; a result that relies on an invalid identifying assumption is not
-corroboration.
-
-% ============================================================
-\section{Policy Implications}
-\label{sec:policy}
-% ============================================================
-
-The results in this paper are associational and the identification concerns are serious.
-We therefore offer modest and conditional implications.
-
-The cross-sectional regularity---86\% of U.S.\ university IP policies score below the
-0.5 communicative-stance neutral point---suggests that most universities maintain
-policies that are predominantly restrictive in tone, heavy in legal load, or unclear
-in guidance to potential inventors. Whether this reflects deliberate strategy, legal
-risk management, institutional inertia, or simply the drafting conventions of legal
-counsel is an open question. The pattern is consistent with the isomorphism account
-of \citet{dimaggio1983} and \citet{meyer1977}: policies may be ceremonially isomorphic
-without being functionally distinct.
-
-The association between more supportive \PCSI{} and the log application-to-disclosure
-index---if it is not entirely spurious---is consistent with the view that policy
-communication quality affects TTO triage efficiency more than research volume.
-Administrators considering policy revisions should be cautious about expecting
-large effects on patent counts, but may find the triage-efficiency interpretation
-more plausible for internal process improvements. However, we emphasize that observational
-data cannot support a recommendation to revise policy communication in expectation
-of improved outcomes; the effect size and the direction of causality remain uncertain.
+For policy, the findings are suggestive rather than prescriptive. The cross-sectional
+regularity that 86\% of U.S.\ research university IP policies score below the
+communicative-stance neutral midpoint indicates that most institutions maintain policies
+that are predominantly legalistic and restrictive in tone. Whether this reflects deliberate
+risk management, legal drafting conventions, or institutional inertia is unclear. The
+positive association between more supportive policy communication and the application-to-disclosure
+margin---however cautiously it must be qualified---is consistent with the view that the
+communicative character of IP policies is not institutionally inconsequential. Universities
+reviewing their IP governance documents may find it worthwhile to consider whether the
+language they use clearly communicates disclosure procedures, explains TTO evaluation
+timelines, and presents the institution as a supportive partner in commercialization.
+Establishing whether such revisions actually change faculty behavior or TTO performance
+requires designs that go beyond what is available here.
 
 % ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
 
-We have studied the association between university IP policy communication stance and
-technology-transfer outcomes using a text-based panel that merges a novel BERT-based
-measure with three decades of AUTM survey data. The main findings are: (i)~U.S.\ research
-universities predominantly communicate their IP policies in a restrictive tone (86\% of
-observations below the 0.5 neutral midpoint); (ii)~\PCSI{} is most consistently
-associated with the log application-to-disclosure index, not with patent volume,
-suggesting an outcome-specificity pattern with implications for the governance-to-commercialization
-model; and (iii)~the primary lag-1 association, while nominally significant at the 5\%
-level, does not survive Benjamini-Hochberg multiple-testing correction (adjusted
-$p=0.374$), while the lag-2 association ($p=0.014$) is more robust.
+This paper documents a positive association between the communicative character of
+university IP policies, measured by the text-based \PCSI{} from \citet{sharma2026pcsi},
+and the log application-to-disclosure index at one- and two-year lags in an institution-year
+panel. The most robust empirical pattern is at the two-year horizon ($\hat\beta \approx 1.34$,
+$p \approx .014$), consistent with the time required for policy communication to propagate
+through the TTO evaluation and patent prosecution process. The association does not
+survive Benjamini-Hochberg correction at lag-1, and the falsification test indicates
+that common time-varying factors cannot be excluded. The paper's contribution is
+therefore to establish this empirical regularity---and to document the conditions under
+which it holds and fails---rather than to resolve the causal question.
 
-We are explicit that these are descriptive panel associations. The falsification test
-(PCSI predicts future research expenditure, $p=0.084$), the absence of credible
-policy-revision events for parallel-trends inference, and the high fraction of
-carried-forward observations all counsel against causal interpretation. The contribution
-of this paper is measurement---introducing and applying a validated text-based instrument
-to a question that has lacked quantitative indicators---and association-documentation.
-The causal question of whether changing IP policy communication improves technology
-transfer remains open.
+The evidence motivates, but does not settle, whether communication itself changes
+commercialization outcomes. Future research that can leverage verified policy adoption
+dates with sharp institutional comparisons, TTO leadership transitions, archived effective
+dates, invention-level records, or faculty survey data would be considerably better
+placed to address the identification challenge. The measurement infrastructure developed
+in \citet{sharma2026pcsi} provides the outcome variable for such designs; the remaining
+requirement is the source of identifying variation.
 
 % ============================================================
 % References
@@ -803,159 +765,6 @@ Measuring communicative stance in university intellectual property policies.
 \bibitem[AUTM(2023)]{autm2023}
 AUTM. (2023). \textit{AUTM Licensing Activity Survey: FY2022}. Association of
 University Technology Managers.
-
-\bibitem[Dechenaux et~al.(2011)]{dechenaux2011}
-Dechenaux, E., Goldfarb, B., Shane, S., \& Thursby, M. (2011). Appropriability and
-the adoption of new technologies: The case of university licensing. \textit{Management
-Science}, 57(7), 1205--1220.
-
-\bibitem[Grimaldi et~al.(2011)]{grimaldi2011}
-Grimaldi, R., Kenney, M., Siegel, D.~S., \& Wright, M. (2011). 30 years after
-Bayh-Dole: Reassessing academic entrepreneurship. \textit{Research Policy}, 40(8),
-1045--1057.
-
-\bibitem[Henderson et~al.(1998)]{henderson1998}
-Henderson, R., Jaffe, A.~B., \& Trajtenberg, M. (1998). Universities as a source of
-commercial technology: A detailed analysis of university patenting, 1965--1988.
-\textit{Review of Economics and Statistics}, 80(1), 119--127.
-
-\bibitem[Jensen and Thursby(2001)]{jensenthursby2001}
-Jensen, R., \& Thursby, M. (2001). Proofs and prototypes for sale: The licensing of
-university inventions. \textit{American Economic Review}, 91(1), 240--259.
-
-\bibitem[Mowery et~al.(2001)]{mowery2001}
-Mowery, D.~C., Nelson, R.~R., Sampat, B.~N., \& Ziedonis, A.~A. (2001).
-The growth of patenting and licensing by U.S.\ universities: An assessment of the
-effects of the Bayh-Dole Act of 1980. \textit{Research Policy}, 30(1), 99--119.
-
-\bibitem[Sampat(2006)]{sampat2006}
-Sampat, B.~N. (2006). Patenting and US academic research in the 20th century: The world
-before and after Bayh-Dole. \textit{Research Policy}, 35(6), 772--789.
-
-\bibitem[Shane(2004)]{shane2004}
-Shane, S. (2004). \textit{Academic Entrepreneurship: University Spinoffs and Wealth
-Creation}. Edward Elgar Publishing.
-
-\bibitem[DiGregorio and Shane(2003)]{digregorio2003}
-DiGregorio, D., \& Shane, S. (2003). Why do some universities generate more start-ups
-than others? \textit{Research Policy}, 32(2), 209--227.
-
-\bibitem[Feldman et~al.(2002)]{feldman2002}
-Feldman, M., Feller, I., Bercovitz, J., \& Burton, R. (2002). Equity and the technology
-transfer strategies of American research universities. \textit{Management Science},
-48(1), 105--121.
-
-\bibitem[Mowery and Sampat(2002)]{mowerysampat2002}
-Mowery, D.~C., \& Sampat, B.~N. (2002). Patenting and licensing university innovations:
-Lessons from the history of the Research Corporation. \textit{Industrial and Corporate
-Change}, 11(2), 279--301.
-
-\bibitem[Thursby and Kemp(2002)]{thursby2002}
-Thursby, J.~G., \& Kemp, S. (2002). Growth and productive efficiency of university
-intellectual property licensing. \textit{Research Policy}, 31(1), 109--124.
-
-\bibitem[Thursby and Thursby(2002)]{thursbythursby2002}
-Thursby, J.~G., \& Thursby, M.~C. (2002). Who is selling the ivory tower? Sources of
-growth in university licensing. \textit{Management Science}, 48(1), 90--104.
-
-\bibitem[Lach and Schankerman(2008)]{lachschankerman2008}
-Lach, S., \& Schankerman, M. (2008). Incentives and invention in universities.
-\textit{RAND Journal of Economics}, 39(2), 403--433.
-
-\bibitem[Owen-Smith and Powell(2001)]{owensmithpowell2001}
-Owen-Smith, J., \& Powell, W.~W. (2001). To patent or not: Faculty decisions and
-institutional success at technology transfer. \textit{Journal of Technology Transfer},
-26(1), 99--114.
-
-\bibitem[Siegel et~al.(2003a)]{siegel2003}
-Siegel, D.~S., Waldman, D., Atwater, L., \& Link, A.~N. (2003a). Commercial knowledge
-transfers from universities to firms: Improving the effectiveness of university-industry
-collaboration. \textit{Journal of High Technology Management Research}, 14(1), 111--133.
-
-\bibitem[Siegel et~al.(2004)]{siegel2004}
-Siegel, D.~S., Waldman, D.~A., Atwater, L.~E., \& Link, A.~N. (2004). Toward a model
-of the effective transfer of scientific knowledge from academicians to practitioners:
-Qualitative evidence from the commercialization of university technologies. \textit{Journal
-of Engineering and Technology Management}, 21(1), 115--142.
-
-\bibitem[DiMaggio and Powell(1983)]{dimaggio1983}
-DiMaggio, P.~J., \& Powell, W.~W. (1983). The iron cage revisited: Institutional
-isomorphism and collective rationality in organizational fields. \textit{American
-Sociological Review}, 48(2), 147--160.
-
-\bibitem[Meyer and Rowan(1977)]{meyer1977}
-Meyer, J.~W., \& Rowan, B. (1977). Institutionalized organizations: Formal structure
-as myth and ceremony. \textit{American Journal of Sociology}, 83(2), 340--363.
-
-\bibitem[Spence(1973)]{spence1973}
-Spence, M. (1973). Job market signaling. \textit{Quarterly Journal of Economics},
-87(3), 355--374.
-
-\bibitem[Suchman(1995)]{suchman1995}
-Suchman, M.~C. (1995). Managing legitimacy: Strategic and institutional approaches.
-\textit{Academy of Management Review}, 20(3), 571--610.
-
-\bibitem[Coase(1960)]{coase1960}
-Coase, R.~H. (1960). The problem of social cost. \textit{Journal of Law and Economics},
-3, 1--44.
-
-\bibitem[Herd and O'Leary(2019)]{herd2019}
-Herd, P., \& O'Leary, C. (2019). Administrative burden: Policymaking by other means.
-\textit{RSF: The Russell Sage Foundation Journal of the Social Sciences}, 5(1), 1--22.
-
-\bibitem[Moynihan et~al.(2015)]{moynihan2015}
-Moynihan, D.~P., Herd, P., \& Harvey, H. (2015). Administrative burden: Learning,
-psychological, and compliance costs in citizen-state interactions. \textit{Journal of
-Public Administration Research and Theory}, 25(1), 43--69.
-
-\bibitem[Williamson(1985)]{williamson1985}
-Williamson, O.~E. (1985). \textit{The Economic Institutions of Capitalism}. Free Press.
-
-\bibitem[Aschenbrenner and Idun(2022)]{ashchenaidu2022}
-Aschenbrenner, L., \& Idun, F. (2022). Language models and legal document analysis:
-A survey. \textit{Journal of Legal Informatics}, 4(1), 1--28.
-
-\bibitem[Devlin et~al.(2019)]{devlin2019}
-Devlin, J., Chang, M.-W., Lee, K., \& Toutanova, K. (2019). BERT: Pre-training of
-deep bidirectional transformers for language understanding. \textit{Proceedings of
-NAACL-HLT 2019}, 4171--4186.
-
-\bibitem[Gentzkow and Kelly(2019)]{gentzkow2019}
-Gentzkow, M., Kelly, B.~T., \& Taddy, M. (2019). Text as data. \textit{Journal of
-Economic Literature}, 57(3), 535--574.
-
-\bibitem[Lerner and Seru(2022)]{lernerseru2022}
-Lerner, J., \& Seru, A. (2022). The use and misuse of patent data: Issues for finance
-and beyond. \textit{Review of Financial Studies}, 35(6), 2667--2704.
-
-\bibitem[Loughran and McDonald(2011)]{loughranmcdonald2011}
-Loughran, T., \& McDonald, B. (2011). When is a liability not a liability? Textual
-analysis, dictionaries, and 10-Ks. \textit{Journal of Finance}, 66(1), 35--65.
-
-\bibitem[Berry and Berry(1990)]{berryberry1990}
-Berry, F.~S., \& Berry, W.~D. (1990). State lottery adoptions as policy innovations:
-An event history analysis. \textit{American Political Science Review}, 84(2), 395--415.
-
-\bibitem[Shipan and Volden(2008)]{shipanvolden2008}
-Shipan, C.~R., \& Volden, C. (2008). The mechanisms of policy diffusion. \textit{American
-Journal of Political Science}, 52(4), 840--857.
-
-\bibitem[Hall and Ziedonis(2001)]{hallziedonis2001}
-Hall, B.~H., \& Ziedonis, R.~H. (2001). The patent paradox revisited: An empirical
-study of patenting in the U.S.\ semiconductor industry, 1979--1995. \textit{RAND Journal
-of Economics}, 32(1), 101--128.
-
-\bibitem[Jaffe(1993)]{jaffe1993}
-Jaffe, A.~B. (1993). The US patent system in transition: Policy innovation and the
-innovation process. \textit{Research Policy}, 29(4--5), 531--557.
-
-\bibitem[Sampat(2019)]{sampat2019}
-Sampat, B.~N. (2019). A survey of empirical evidence on patents and innovation.
-\textit{NBER Working Paper} No.\ 25383.
-
-\bibitem[Athey and Imbens(2022)]{atheyimbens2022}
-Athey, S., \& Imbens, G.~W. (2022). Design-based analysis in difference-in-differences
-settings with staggered adoption. \textit{Journal of Econometrics}, 226(1), 62--79.
 
 \bibitem[Baker et~al.(2022)]{bakerlarkerwang2022}
 Baker, A.~C., Larcker, D.~F., \& Wang, C.~C.~Y. (2022). How much should we trust
@@ -979,10 +788,24 @@ de~Chaisemartin, C., \& D'Haultf{\oe}uille, X. (2020). Two-way fixed effects est
 with heterogeneous treatment effects. \textit{American Economic Review}, 110(9),
 2964--2996.
 
-\bibitem[de~Chaisemartin and D'Haultf{\oe}uille(2023)]{dechaisemartin2023}
-de~Chaisemartin, C., \& D'Haultf{\oe}uille, X. (2023). Two-way fixed effects and
-differences-in-differences with heterogeneous treatment effects: A survey.
-\textit{Econometrics Journal}, 26(3), C1--C30.
+\bibitem[Dechenaux et~al.(2011)]{dechenaux2011}
+Dechenaux, E., Goldfarb, B., Shane, S., \& Thursby, M. (2011). Appropriability and
+the adoption of new technologies: The case of university licensing. \textit{Management
+Science}, 57(7), 1205--1220.
+
+\bibitem[Devlin et~al.(2019)]{devlin2019}
+Devlin, J., Chang, M.-W., Lee, K., \& Toutanova, K. (2019). BERT: Pre-training of
+deep bidirectional transformers for language understanding. In \textit{Proceedings of
+NAACL-HLT 2019}, 4171--4186.
+
+\bibitem[DiGregorio and Shane(2003)]{digregorio2003}
+DiGregorio, D., \& Shane, S. (2003). Why do some universities generate more start-ups
+than others? \textit{Research Policy}, 32(2), 209--227.
+
+\bibitem[DiMaggio and Powell(1983)]{dimaggio1983}
+DiMaggio, P.~J., \& Powell, W.~W. (1983). The iron cage revisited: Institutional
+isomorphism and collective rationality in organizational fields. \textit{American
+Sociological Review}, 48(2), 147--160.
 
 \bibitem[Farre-Mensa et~al.(2020)]{farremensa2020}
 Farre-Mensa, J., Hegde, D., \& Ljungqvist, A. (2020). What is a patent worth? Evidence
@@ -992,6 +815,54 @@ from the U.S.\ patent ``lottery.'' \textit{Journal of Finance}, 75(2), 639--682.
 Goodman-Bacon, A. (2021). Difference-in-differences with variation in treatment timing.
 \textit{Journal of Econometrics}, 225(2), 254--277.
 
+\bibitem[Henderson et~al.(1998)]{henderson1998}
+Henderson, R., Jaffe, A.~B., \& Trajtenberg, M. (1998). Universities as a source of
+commercial technology: A detailed analysis of university patenting, 1965--1988.
+\textit{Review of Economics and Statistics}, 80(1), 119--127.
+
+\bibitem[Jaffe(1993)]{jaffe1993}
+Jaffe, A.~B. (1993). The US patent system in transition: Policy innovation and the
+innovation process. \textit{Research Policy}, 29(4--5), 531--557.
+
+\bibitem[Jensen and Thursby(2001)]{jensenthursby2001}
+Jensen, R., \& Thursby, M. (2001). Proofs and prototypes for sale: The licensing of
+university inventions. \textit{American Economic Review}, 91(1), 240--259.
+
+\bibitem[Lach and Schankerman(2008)]{lachschankerman2008}
+Lach, S., \& Schankerman, M. (2008). Incentives and invention in universities.
+\textit{RAND Journal of Economics}, 39(2), 403--433.
+
+\bibitem[Lerner and Seru(2022)]{lernerseru2022}
+Lerner, J., \& Seru, A. (2022). The use and misuse of patent data: Issues for finance
+and beyond. \textit{Review of Financial Studies}, 35(6), 2667--2704.
+
+\bibitem[Loughran and McDonald(2011)]{loughranmcdonald2011}
+Loughran, T., \& McDonald, B. (2011). When is a liability not a liability? Textual
+analysis, dictionaries, and 10-Ks. \textit{Journal of Finance}, 66(1), 35--65.
+
+\bibitem[Gentzow et~al.(2019)]{gentzkowkellytaddy2019}
+Gentzkow, M., Kelly, B.~T., \& Taddy, M. (2019). Measuring group differences in
+high-dimensional choices: Method and application to congressional speech.
+\textit{Econometrica}, 87(4), 1307--1340.
+
+\bibitem[Gentzkow et~al.(2019)]{gentzkow2019}
+Gentzkow, M., Kelly, B.~T., \& Taddy, M. (2019). Text as data. \textit{Journal of
+Economic Literature}, 57(3), 535--574.
+
+\bibitem[Meyer and Rowan(1977)]{meyer1977}
+Meyer, J.~W., \& Rowan, B. (1977). Institutionalized organizations: Formal structure
+as myth and ceremony. \textit{American Journal of Sociology}, 83(2), 340--363.
+
+\bibitem[Mowery et~al.(2001)]{mowery2001}
+Mowery, D.~C., Nelson, R.~R., Sampat, B.~N., \& Ziedonis, A.~A. (2001).
+The growth of patenting and licensing by U.S.\ universities: An assessment of the
+effects of the Bayh-Dole Act of 1980. \textit{Research Policy}, 30(1), 99--119.
+
+\bibitem[Owen-Smith and Powell(2001)]{owensmithpowell2001}
+Owen-Smith, J., \& Powell, W.~W. (2001). To patent or not: Faculty decisions and
+institutional success at technology transfer. \textit{Journal of Technology Transfer},
+26(1), 99--114.
+
 \bibitem[Rambachan and Roth(2023)]{rambachanroth2023}
 Rambachan, A., \& Roth, J. (2023). A more credible approach to parallel trends.
 \textit{Review of Economic Studies}, 90(5), 2555--2591.
@@ -1000,43 +871,79 @@ Rambachan, A., \& Roth, J. (2023). A more credible approach to parallel trends.
 Roth, J. (2022). Pre-test with caution: Event-study estimates after testing for parallel
 trends. \textit{American Economic Review: Insights}, 4(3), 305--322.
 
-\bibitem[Roth and Sant'Anna(2023)]{rothsantanna2023}
-Roth, J., \& Sant'Anna, P.~H.~C. (2023). When is parallel trends sensitive to functional
-form? \textit{Econometrica}, 91(2), 737--747.
+\bibitem[Sampat(2006)]{sampat2006}
+Sampat, B.~N. (2006). Patenting and US academic research in the 20th century: The world
+before and after Bayh-Dole. \textit{Research Policy}, 35(6), 772--789.
 
-\bibitem[Roth et~al.(2023)]{rothsantannatrends2023}
-Roth, J., Sant'Anna, P.~H.~C., Bilinski, A., \& Poe, J. (2023). What's trending in
-difference-in-differences? A synthesis of the recent econometrics literature.
-\textit{Journal of Econometrics}, 235(2), 2218--2244.
+\bibitem[Siegel et~al.(2003)]{siegel2003}
+Siegel, D.~S., Waldman, D., Atwater, L., \& Link, A.~N. (2003). Commercial knowledge
+transfers from universities to firms: Improving the effectiveness of university-industry
+collaboration. \textit{Journal of High Technology Management Research}, 14(1), 111--133.
 
-\bibitem[Sant'Anna and Zhao(2020)]{santannazhao2020}
-Sant'Anna, P.~H.~C., \& Zhao, J. (2020). Doubly robust difference-in-differences
-estimators. \textit{Journal of Econometrics}, 219(1), 101--122.
+\bibitem[Siegel et~al.(2004)]{siegel2004}
+Siegel, D.~S., Waldman, D.~A., Atwater, L.~E., \& Link, A.~N. (2004). Toward a model
+of the effective transfer of scientific knowledge from academicians to practitioners.
+\textit{Journal of Engineering and Technology Management}, 21(1), 115--142.
+
+\bibitem[Suchman(1995)]{suchman1995}
+Suchman, M.~C. (1995). Managing legitimacy: Strategic and institutional approaches.
+\textit{Academy of Management Review}, 20(3), 571--610.
 
 \bibitem[Sun and Abraham(2021)]{sunabr2021}
 Sun, L., \& Abraham, S. (2021). Estimating dynamic treatment effects in event studies
 with heterogeneous treatment effects. \textit{Journal of Econometrics}, 225(2), 175--199.
 
-\bibitem[Gentzkov et~al.(2019)]{gentzkowkellytaddy2019}
-Gentzkow, M., Kelly, B.~T., \& Taddy, M. (2019). Measuring group differences in
-high-dimensional choices: Method and application to congressional speech.
-\textit{Econometrica}, 87(4), 1307--1340.
+\bibitem[Thursby and Kemp(2002)]{thursby2002}
+Thursby, J.~G., \& Kemp, S. (2002). Growth and productive efficiency of university
+intellectual property licensing. \textit{Research Policy}, 31(1), 109--124.
+
+\bibitem[Thursby and Thursby(2002)]{thursbythursby2002}
+Thursby, J.~G., \& Thursby, M.~C. (2002). Who is selling the ivory tower? Sources of
+growth in university licensing. \textit{Management Science}, 48(1), 90--104.
 
 \end{thebibliography}
 
 % ============================================================
-% Appendices
-% ============================================================
-
 \appendix
 
-\section{Sub-Index Correlation Matrix}
-\label{app:corrmatrix}
+\section{Lag Sensitivity: Full Results}
+\label{app:lagsens}
+
+\begin{table}[htbp]
+\centering
+\caption{Lag Sensitivity: All Outcomes, Contemporaneous through Lag-5}
+\label{tab:lagsens}
+\begin{threeparttable}
+\begin{tabular}{lrrrrrr}
+\toprule
+Outcome & Contemp. & Lag 1 & Lag 2 & Lag 3 & Lag 4 & Lag 5 \\
+\midrule
+Log app-to-disclosure & $0.720$ & $1.000^{**}$ & $1.343^{**}$ & $0.918^*$ & $0.411$ & $0.382$ \\
+Ln(new patent apps) & $0.436$ & $0.616$ & $1.115^{**}$ & $0.584$ & $0.195$ & $0.443$ \\
+Ln(total patent apps) & $0.732$ & $0.796$ & $0.905$ & $0.498$ & $0.411$ & $0.683$ \\
+Ln(patents issued) & $0.496$ & $0.763$ & $1.114^*$ & $1.244^{**}$ & $1.446^{**}$ & $1.753^{***}$ \\
+Ln(disclosures) & $-0.284$ & $-0.384$ & $-0.229$ & $-0.334$ & $-0.216$ & $0.061$ \\
+Ln(licenses executed) & $0.596$ & $0.570$ & $0.214$ & $0.102$ & $0.342$ & $-0.743$ \\
+Ln(startups) & $0.572$ & $0.269$ & $-0.259$ & $-0.619$ & $-0.203$ & $-0.152$ \\
+Ln(license income) & $0.654$ & $0.694$ & $0.989$ & $0.215$ & $0.382$ & $0.783$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textit{Notes:} Each cell is the \PCSI{} coefficient from a separate TWFE regression
+at the indicated lag with full controls and institution-clustered SEs.
+$^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\section{Sub-Index Correlation Matrix and Decomposition}
+\label{app:channel}
 
 \begin{table}[htbp]
 \centering
 \caption{Sub-Index Correlation Matrix (Lagged One Year)}
-\label{tab:a1}
+\label{tab:corrmatrix}
 \begin{tabular}{lrrrr}
 \toprule
  & \PCSI{} & Tone & Clarity & Legal Load \\
@@ -1049,106 +956,37 @@ Legal Load & 0.190 & $-0.026$ & $-0.166$ & 1.000 \\
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} Correlations computed on the lag-1 matched sample ($N=2{,}115$).
-The low correlation between Clarity and \PCSI{} ($r=0.037$) reflects that the
-clarity sub-index captures a dimension of policy communication largely orthogonal
-to the overall tone score.
+\item \textit{Notes:} Correlations computed on the estimation sample ($N=2{,}115$).
+Clarity is nearly orthogonal to the composite \PCSI{}.
 \end{tablenotes}
 \end{table}
 
-\section{Lag Sensitivity}
-\label{app:lagsens}
-
 \begin{table}[htbp]
 \centering
-\caption{Lag Sensitivity: All Outcomes}
-\label{tab:b3}
-\begin{threeparttable}
-\begin{tabular}{lrrrrrr}
-\toprule
-Outcome & Contemp. & Lag 1 & Lag 2 & Lag 3 & Lag 4 & Lag 5 \\
-\midrule
-Ln(new patent apps) & $+0.436$ & $+0.616$ & $+1.115^{**}$ & $+0.584$ & $+0.195$ & $+0.443$ \\
-Ln(total patent apps) & $+0.732$ & $+0.796$ & $+0.905$ & $+0.498$ & $+0.411$ & $+0.683$ \\
-Ln(patents issued) & $+0.496$ & $+0.763$ & $+1.114^{*}$ & $+1.244^{**}$ & $+1.446^{**}$ & $+1.753^{***}$ \\
-Ln(disclosures) & $-0.284$ & $-0.384$ & $-0.229$ & $-0.334$ & $-0.216$ & $+0.061$ \\
-Log app-to-disclosure & $+0.720$ & $+1.000^{**}$ & $+1.343^{**}$ & $+0.918^{*}$ & $+0.411$ & $+0.382$ \\
-Ln(licenses exec.) & $+0.596$ & $+0.570$ & $+0.214$ & $+0.102$ & $+0.342$ & $-0.743$ \\
-Ln(startups formed) & $+0.572$ & $+0.269$ & $-0.259$ & $-0.619$ & $-0.203$ & $-0.152$ \\
-Ln(license income) & $+0.654$ & $+0.694$ & $+0.989$ & $+0.215$ & $+0.382$ & $+0.783$ \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\small
-\item \textit{Notes:} Each cell reports the \PCSI{} coefficient from a separate TWFE
-regression at the indicated lag. Stars based on institution-clustered SEs.
-$^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-\section{Robustness Suite}
-\label{app:robust}
-
-\begin{table}[htbp]
-\centering
-\caption{Robustness Suite}
-\label{tab:b1}
+\caption{Sub-Index Decomposition}
+\label{tab:subindex}
 \begin{threeparttable}
 \begin{tabular}{lrrrr}
 \toprule
-Specification & $\hat\beta$ & SE & $p$ & $N$ \\
+Sub-index & $\hat\beta$ & SE & $p$ & $N$ \\
 \midrule
-\multicolumn{5}{l}{\textit{Panel A: Log new patent applications}} \\
-Baseline (lag-1 \PCSI{}) & $+0.616$ & 0.523 & 0.241 & 2,115 \\
-Winsorized 1st/99th & $+0.841$ & 0.593 & 0.158 & 2,115 \\
-Balanced panel ($\geq 15$ obs) & $+0.693$ & 0.595 & 0.246 & 1,794 \\
-R1 universities only & $+0.978^*$ & 0.572 & 0.089 & 1,866 \\
-HC3 standard errors & $+0.616^{**}$ & 0.308 & 0.046 & 2,115 \\
-Lagged outcome (Nickell-biased LB) & $+0.339$ & 0.306 & 0.269 & 2,115 \\
-Falsification: \PCSI{} $\to$ Ln(future res.\ exp.) & $+0.440^*$ & 0.253 & 0.084 & 1,773 \\
-Leave-one-out range & \multicolumn{4}{l}{$[+0.340,\; +0.874]$, 100\% positive ($N=253$ institutions)} \\
+\multicolumn{5}{l}{\textit{Panel A: Sequential regressions, log new patent applications}} \\[2pt]
+Tone index & $0.050$ & $0.077$ & $.513$ & 2,115 \\
+Clarity index & $-0.141$ & $0.092$ & $.124$ & 2,115 \\
+Legal load index & $0.008$ & $0.070$ & $.906$ & 2,115 \\
 \midrule
-\multicolumn{5}{l}{\textit{Panel B: Log application-to-disclosure index}} \\
-Baseline (lag-1 \PCSI{}) & $+1.000^{**}$ & 0.500 & 0.047 & 2,115 \\
-Winsorized 1st/99th & $+1.224^{**}$ & 0.586 & 0.038 & 2,115 \\
-Balanced panel ($\geq 15$ obs) & $+1.046^{*}$ & 0.563 & 0.066 & 1,794 \\
-R1 universities only & $+1.166^{*}$ & 0.598 & 0.053 & 1,866 \\
-Lag-2 \PCSI{} & $+1.343^{**}$ & 0.540 & 0.014 & 1,781 \\
+\multicolumn{5}{l}{\textit{Panel B: Sequential regressions, log application-to-disclosure index}} \\[2pt]
+Tone index & $0.009$ & $0.062$ & $.887$ & 2,115 \\
+Clarity index & $-0.082$ & $0.070$ & $.241$ & 2,115 \\
+Legal load index & $0.029$ & $0.062$ & $.649$ & 2,115 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \small
-\item \textit{Notes:} All regressions include institution and year FEs and lagged
-controls unless otherwise noted. The falsification test regresses log research
-expenditure in year $t+1$ on \PCSI{} in year $t$. $^*p<0.10$, $^{**}p<0.05$,
-$^{***}p<0.01$.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-\section{Negative Binomial Robustness}
-\label{app:negbin}
-
-\begin{table}[htbp]
-\centering
-\caption{Negative Binomial Robustness for New Patent Applications}
-\label{tab:b2}
-\begin{threeparttable}
-\begin{tabular}{lrrrr}
-\toprule
-Controls & $\hat\beta$ & SE & $p$ & $N$ \\
-\midrule
-No controls & $+0.468$ & 0.550 & 0.394 & 2,151 \\
-With controls & $+0.342$ & 0.532 & 0.520 & 2,115 \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\small
-\item \textit{Notes:} Negative binomial regression for raw patent application
-counts (not log-transformed). New patent application counts are overdispersed
-(variance/mean $\approx 207$), motivating the negative binomial. The \PCSI{}
-coefficient is not significant in either specification.
+\item \textit{Notes:} Each row is a separate regression substituting the indicated
+sub-index for \PCSI{} with full controls. No sub-index reaches significance for
+either outcome; the source of the composite association is not clearly localized
+in a single dimension.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
@@ -1156,90 +994,39 @@ coefficient is not significant in either specification.
 \section{Exploratory Policy-Revision Diagnostic}
 \label{app:eventdiag}
 
-\textbf{Important caveat.} This appendix presents a descriptive analysis of
-outcome trajectories around policy-revision events identified in our \PCSI{} data.
-It is \emph{not} causal identification. The parallel-trends assumption is not
-credible in this setting: a high-confidence audit recovers only three AUTM-linked
-revision events with verified effective dates (Louisiana State University, Oklahoma
-State University, and the University of New Orleans), and these institutions show
-substantial pre-revision differences in outcomes relative to the comparison group.
-The estimates below should be interpreted as descriptive summaries of post-revision
-trajectories, not as causal effects of policy revision.
+This appendix documents an exploratory analysis of outcome trajectories around policy
+revisions identified in the \PCSI{} panel. It is not an event study in the causal
+sense and should not be interpreted as one.
 
-We define policy-revision events as institution-years in which $|\Delta\PCSI{}|>0.05$
-(37 events, 30 institutions). The targeted DiD specification uses event-time windows
-$e_t \in \{-4,\ldots,+4\}$ relative to the revision year, with comparison groups
-drawn from non-revising institutions in the same year. Following the notation of
-\citet{callaway2021} and \citet{sunabr2021}, we estimate:
+The full panel contains 37 institution-years in which $|\Delta\PCSI{}|>0.05$, across
+30 institutions. A high-confidence audit that requires an independently verified
+effective date from a public document (board minutes, press release, or archived policy
+repository) and AUTM survey continuity in the surrounding years recovers three qualifying
+events: Louisiana State University, Oklahoma State University, and the University of
+New Orleans. All three exhibit substantial pre-revision differences in outcomes relative
+to comparison institutions. Under any of the leading difference-in-differences estimators
+for staggered adoption \citep{callaway2021, sunabr2021, dechaisemartin2020,
+goodmanbacon2021}, a design in which the parallel-trends assumption is violated in this
+manner does not support a causal interpretation of the post-revision coefficients
+\citep{roth2022, rambachanroth2023}.
 
-\begin{equation}
-  Y_{it} = \alpha_i + \lambda_t + \sum_{k \neq -1} \delta_k \cdot \mathbf{1}[e_{it}=k] + \varepsilon_{it}
-\end{equation}
-
-Figure~\ref{fig:pretrend} shows the event-study estimates. Pre-revision coefficients
-are positive and increasing for several periods before the revision year,
-indicating that revising institutions were already on a different trajectory. The
-post-revision coefficients continue to rise, but the pre-trend pattern means the
-post-revision estimates conflate a genuine post-revision change with the pre-existing
-trend. The targeted DiD estimate for event-times $\{+2,+3\}$ versus $\{-4,-3\}$
-is $\hat\delta = +0.458$ (SE $= 0.143$, $p = 0.003$), but this estimate should not
-be interpreted causally given the pre-trend evidence.
+Figure~\ref{fig:pretrend} shows the event-study coefficients for new patent applications
+relative to the revision year. The positive pre-revision trend visible in the figure
+is the diagnostic evidence that the identified revising institutions were already on a
+divergent trajectory, which prevents attribution of the post-revision pattern to the
+policy revision itself. We include this figure as a transparency exercise, not as
+evidence that the panel estimates in Section~\ref{sec:results} are causally identified.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\textwidth]{figures/fig2_pretrend.pdf}
-  \caption{Exploratory Policy-Revision Event Study (Log New Patent Applications)}
+  \caption{Exploratory Event-Study Diagnostic: Log New Patent Applications}
   \label{fig:pretrend}
   \footnotesize
-  \textit{Notes:} Event-study coefficients with 95\% confidence intervals from
-  equation~(\ref{eq:baseline}) variant with event-time indicators, normalized to
-  zero at $e_t = -1$. Pre-revision positive trend indicates parallel trends
-  assumption is not satisfied. \textbf{These estimates are descriptive only; causal
-  interpretation is not warranted.}
+  \textit{Notes:} Event-study coefficients and 95\% confidence intervals normalized
+  to zero at event-time $-1$. The positive pre-revision trend indicates that parallel
+  trends is not credible in this sample. These estimates are descriptive and do not
+  support a causal interpretation.
 \end{figure}
-
-\section{Mechanism: Channel Analysis}
-\label{app:channel}
-
-\begin{table}[htbp]
-\centering
-\caption{Channel Analysis: Sub-Index Decomposition}
-\label{tab:channel}
-\begin{threeparttable}
-\begin{tabular}{lrrrr}
-\toprule
-Sub-index & $\hat\beta$ & SE & $p$ & $N$ \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel A: Sequential, outcome = Ln(new patent applications)}} \\
-Tone index & $+0.050$ & 0.077 & 0.513 & 2,115 \\
-Clarity index & $-0.141$ & 0.092 & 0.124 & 2,115 \\
-Legal load index & $+0.008$ & 0.070 & 0.906 & 2,115 \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel B: Joint, outcome = Ln(new patent applications)}} \\
-Tone index & $+0.086$ & 0.082 & 0.298 & 2,115 \\
-Clarity index & $-0.160^*$ & 0.092 & 0.083 & 2,115 \\
-Legal load index & $+0.005$ & 0.067 & 0.939 & 2,115 \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel C: Sequential, outcome = Log app-to-disclosure index}} \\
-Tone index & $+0.009$ & 0.062 & 0.887 & 2,115 \\
-Clarity index & $-0.082$ & 0.070 & 0.241 & 2,115 \\
-Legal load index & $+0.029$ & 0.062 & 0.649 & 2,115 \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel D: Joint, outcome = Log app-to-disclosure index}} \\
-Tone index & $+0.030$ & 0.065 & 0.646 & 2,115 \\
-Clarity index & $-0.087$ & 0.074 & 0.240 & 2,115 \\
-Legal load index & $+0.026$ & 0.062 & 0.675 & 2,115 \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\small
-\item \textit{Notes:} Sequential panels enter each sub-index separately with full
-controls. Joint panels enter all three sub-indices simultaneously. None of the
-sub-index coefficients is significant at the 5\% level for the application-to-disclosure
-outcome, suggesting the overall \PCSI{} association does not decompose cleanly into
-a single sub-dimension. $^*p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
 
 \end{document}
