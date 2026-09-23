@@ -69,7 +69,7 @@ Sujan Basnet\textsuperscript{3}, Marco Cossco\textsuperscript{4}}
 \small
 \textbf{Abstract.} We study the cross-sectional and intertemporal association between
 university intellectual-property policy communication and technology-transfer activity
-using a novel text-based measure developed in companion work. The Policy Communication
+using a novel text-based measure developed in \citet{sharma2026pcsi}. The Policy Communication
 Stance Index (\PCSI{}) encodes the tone, clarity, and legal load of 150 U.S.\ research
 university IP policy documents over 1991--2023 using sentence-level BERT embeddings,
 producing approximately 87,160 scored sentences across 2,564 institution-year observations.
@@ -152,26 +152,21 @@ briefly describes the appendix event-study diagnostic. Section~\ref{sec:policy} 
 policy implications. Section~\ref{sec:conclusion} concludes.
 
 % ============================================================
-\section{Relationship to Paper 1}
+\section{Relationship to the Companion Measurement Paper}
 \label{sec:paper1}
 % ============================================================
 
-This paper is the second in a two-paper series. Paper~1 develops and validates the
-\PCSI{} measure in detail: it describes the sentence corpus construction, the BERT
-fine-tuning procedure, the dimensionality reduction into tone, clarity, and legal-load
-sub-indices, and the validation exercises including human-rating inter-rater reliability
-and convergent validity with existing policy-quality measures. We do not repeat that
-material here. Readers who require detail on measurement should consult Paper~1 directly.
+This paper is the empirical companion to \citet{sharma2026pcsi}, which develops and
+validates the \PCSI{} measure. All measurement details---sentence corpus construction,
+BERT fine-tuning, dimensionality reduction into tone, clarity, and legal-load sub-indices,
+and validation exercises including inter-rater reliability and convergent validity---are
+reported there and are not repeated here. We take the \PCSI{} scores as given inputs.
 
-For the purposes of this paper, we take the following as given from Paper~1: (i)~the
-sentence-level \PCSI{} scores for 150 institutions over 1991--2023, (ii)~the three
-sub-index constructions (tone, clarity, legal load), and (iii)~the policy-revision event
-dates that Paper~1 identified from public sources. We report one reconciliation item:
-Paper~1 reports approximately 87,321 scored sentences; after removing three BYU parsing
-artifacts (institution-years 2021--2023 with implausibly long mean sentence length
-$\approx$4,006 words) and reconciling one duplicate entry, the working corpus used in this
-paper contains approximately 87,160 sentences. This difference does not affect any
-institution-level aggregates materially.
+One reconciliation item: \citet{sharma2026pcsi} reports approximately 87,321 scored
+sentences; after removing three BYU parsing artifacts (institution-years 2021--2023 with
+implausibly long mean sentence length $\approx$4,006 words) and reconciling one duplicate
+entry, the working corpus used in this paper contains approximately 87,160 sentences.
+This difference does not affect any institution-level aggregates materially.
 
 % ============================================================
 \section{Conceptual Framework}
@@ -799,6 +794,11 @@ transfer remains open.
 
 \bibliographystyle{aer}
 \begin{thebibliography}{99}
+
+\bibitem[Sharma et~al.(2026)]{sharma2026pcsi}
+Sharma, K., Wang, L., Basnet, S., \& Cossco, M. (2026). Communication as governance:
+Measuring communicative stance in university intellectual property policies.
+\textit{Working Paper}, September 2026.
 
 \bibitem[AUTM(2023)]{autm2023}
 AUTM. (2023). \textit{AUTM Licensing Activity Survey: FY2022}. Association of
