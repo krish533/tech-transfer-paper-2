@@ -1,0 +1,71 @@
+name: Cross-repo replication verification
+
+on:
+  push:
+    branches:
+      - verified-cross-repo-replication-2026-09-25
+    paths:
+      - P2_replication_package/code/verify_cross_repo.py
+      - P2_replication_package/code/replication.py
+      - P2_replication_package/code/run_all.py
+      - P2_replication_package/data/merged_autm.csv
+      - P2_replication_package/requirements.txt
+      - .github/workflows/cross_repo_replication.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: P2_replication_package/requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r P2_replication_package/requirements.txt
+
+      - name: Preserve committed Paper 2 output log
+        run: cp P2_replication_package/paper_outputs/logs/replication_output.txt /tmp/replication_output_committed.txt
+
+      - name: Verify Paper 1-Paper 2 data chain and build clean dataset
+        run: python P2_replication_package/code/verify_cross_repo.py
+
+      - name: Re-run complete Paper 2 replication
+        run: python P2_replication_package/code/run_all.py
+
+      - name: Confirm complete Paper 2 output is unchanged
+        shell: bash
+        run: |
+          if ! cmp -s /tmp/replication_output_committed.txt P2_replication_package/paper_outputs/logs/replication_output.txt; then
+            echo 'Paper 2 replication output differs from the committed verified log.'
+            diff -u /tmp/replication_output_committed.txt P2_replication_package/paper_outputs/logs/replication_output.txt || true
+            exit 1
+          fi
+          echo 'Complete Paper 2 replication log is byte-for-byte identical.'
+
+      - name: Commit generated verification artifacts
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            P2_replication_package/data/verified_replication_dataset.csv \
+            P2_replication_package/paper_outputs/logs/cross_repo_verification.md \
+            P2_replication_package/paper_outputs/logs/cross_repo_verification.json
+          if git diff --cached --quiet; then
+            echo 'Verification artifacts already current.'
+          else
+            git commit -m 'Generate verified cross-repository replication artifacts'
+            git push
+          fi
