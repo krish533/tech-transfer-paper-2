@@ -23,7 +23,7 @@ P1_URL = (
     f"{P1_COMMIT}/P1_replication_package/data/derived/"
     "policy_level_indices_institution_year.csv"
 )
-EXPECTED_P2_SHA256 = "d0776a261103f828bbdf59af301fd871f460c82781d621f8217f54fb36dc4a86"
+EXPECTED_P2_SHA256 = "070f10179b34a0730d1f09ea3322d21e8f32e20d3036760df2adfef182aa2d4b"
 EXPECTED_CROSS_MATCH = 2564
 EXPECTED_BASELINE = {
     "beta": 0.6159,
