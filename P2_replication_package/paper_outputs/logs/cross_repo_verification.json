@@ -1,0 +1,56 @@
+{
+  "paper1_commit": "25a9472b34334825b6d6c6a334f5b88eb00695b5",
+  "paper2_base_commit": "88cf4a1c02540b136adb8beaa35e212625ac755e",
+  "paper1_panel_sha256": "694c21acc07d2a50ed27199d0e7ec01bb6974f08f843cbce2d7da4318f864198",
+  "paper2_merged_autm_sha256": "070f10179b34a0730d1f09ea3322d21e8f32e20d3036760df2adfef182aa2d4b",
+  "verified_dataset_sha256": "de5377b98c1261c5de9a5b4df21efb86af04bbdce28cb3676ec37c61456fcdf6",
+  "paper1_full_rows": 4296,
+  "paper1_institutions": 150,
+  "paper1_primary_rows_1944_2025": 4277,
+  "paper1_direct_observed_rows_1944_2025": 480,
+  "paper2_rows": 3507,
+  "paper2_rows_with_pci": 2564,
+  "paper2_institution_name_column": "Institution_pci",
+  "institution_candidate_match_counts": {
+    "Institution": 2304,
+    "Institution_std": 2304,
+    "Land-Grant Institution": 0,
+    "Land-Grant Institution (cat)": 0,
+    "Institution_std_lower": 2434,
+    "Institution Founding Year": 0,
+    "Institution_pci": 2564
+  },
+  "cross_repo_matches": 2564,
+  "cross_repo_columns_compared": [
+    "Mean_Tone_Score",
+    "Median_Tone_Score",
+    "Tone_Index",
+    "Clarity_Index",
+    "Legal_Load_Index",
+    "n_sentences",
+    "n_words",
+    "Source_Year",
+    "Is_Carried_Forward"
+  ],
+  "cross_repo_columns_missing_from_comparison": [],
+  "cross_repo_mismatches": {
+    "Mean_Tone_Score": 0,
+    "Median_Tone_Score": 0,
+    "Tone_Index": 0,
+    "Clarity_Index": 0,
+    "Legal_Load_Index": 0,
+    "n_sentences": 0,
+    "n_words": 0,
+    "Source_Year": 0,
+    "Is_Carried_Forward": 0
+  },
+  "baseline": {
+    "beta": 0.615865846962195,
+    "se": 0.5233677659080824,
+    "p": 0.24058994726194838,
+    "n": 2115
+  },
+  "verified_dataset_rows": 3507,
+  "verified_dataset_columns": 46,
+  "verified_dataset_paper1_match_rows": 2564
+}
